@@ -1,0 +1,51 @@
+import { lazy, Suspense } from 'react';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { LoadingBlock } from './components/ui/Feedback';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import { ToastProvider } from './context/ToastContext';
+import { AppLayout } from './layouts/AppLayout';
+import { ProtectedRoute, RoleGate } from './layouts/guards';
+
+const Login = lazy(() => import('./pages/Login'));
+const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
+const ResetPassword = lazy(() => import('./pages/ResetPassword'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Students = lazy(() => import('./pages/Students'));
+const StudentCreate = lazy(() => import('./pages/StudentCreate'));
+const StudentDetail = lazy(() => import('./pages/StudentDetail'));
+const StudentHome = lazy(() => import('./pages/StudentHome'));
+const NotFound = lazy(() => import('./pages/NotFound'));
+
+function Home() {
+  const { user } = useAuth();
+  return user?.role === 'trainer' ? <Dashboard /> : <StudentHome />;
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <AuthProvider>
+        <ToastProvider>
+          <Suspense fallback={<div style={{ minHeight: '100vh', display: 'grid', placeItems: 'center' }}><LoadingBlock /></div>}>
+            <Routes>
+              <Route path="/ingresar" element={<Login />} />
+              <Route path="/recuperar" element={<ForgotPassword />} />
+              <Route path="/restablecer-contrasena" element={<ResetPassword />} />
+              <Route element={<ProtectedRoute />}>
+                <Route element={<AppLayout />}>
+                  <Route index element={<Home />} />
+                  <Route element={<RoleGate role="trainer" />}>
+                    <Route path="alumnos" element={<Students />} />
+                    <Route path="alumnos/nuevo" element={<StudentCreate />} />
+                    <Route path="alumnos/:id" element={<StudentDetail />} />
+                  </Route>
+                  <Route path="*" element={<NotFound />} />
+                </Route>
+              </Route>
+            </Routes>
+          </Suspense>
+        </ToastProvider>
+      </AuthProvider>
+    </BrowserRouter>
+  );
+}
