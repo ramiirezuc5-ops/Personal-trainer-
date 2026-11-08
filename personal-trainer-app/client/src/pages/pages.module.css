@@ -30,3 +30,26 @@
 .dl dt { color: var(--color-text-muted); font-size: var(--text-xs); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 2px; }
 .dl dd { margin: 0; font-size: var(--text-sm); overflow-wrap: anywhere; }
 .stack { display: flex; flex-direction: column; gap: var(--space-4); }
+
+/* ---------- Ejercicios y rutinas ---------- */
+.filters3 { display: grid; grid-template-columns: 1fr; gap: var(--space-3); margin-bottom: var(--space-4); }
+@media (min-width: 720px) { .filters3 { grid-template-columns: 2fr 1fr 1fr; } }
+.filters2 { display: grid; grid-template-columns: 1fr; gap: var(--space-3); margin-bottom: var(--space-4); }
+@media (min-width: 720px) { .filters2 { grid-template-columns: 1fr 1fr; } }
+.rowStatic { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); padding: var(--space-4); border-bottom: 1px solid var(--color-border); flex-wrap: wrap; }
+.rowStatic:last-child { border-bottom: 0; }
+.rowActions { display: flex; gap: var(--space-2); flex-wrap: wrap; }
+.problems { margin: var(--space-2) 0 0; padding-left: var(--space-5); }
+.itemBox { display: flex; gap: var(--space-3); align-items: flex-start; padding: var(--space-4); border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface-2); }
+.itemBox + .itemBox { margin-top: var(--space-3); }
+.itemGrid { flex: 1; min-width: 0; display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-3); }
+.itemGrid .c2, .itemGrid .c4 { grid-column: 1 / -1; }
+@media (min-width: 900px) {
+  .itemGrid { grid-template-columns: repeat(6, 1fr); }
+  .itemGrid .c2 { grid-column: span 2; }
+  .itemGrid .c4 { grid-column: span 4; }
+}
+.itemTools { display: flex; flex-direction: column; gap: var(--space-1); }
+.dayHead { display: grid; grid-template-columns: 1fr; gap: var(--space-3); margin-bottom: var(--space-4); }
+@media (min-width: 720px) { .dayHead { grid-template-columns: 1fr 2fr; } }
+.dayActions { margin-top: var(--space-4); }

@@ -14,6 +14,10 @@ const Students = lazy(() => import('./pages/Students'));
 const StudentCreate = lazy(() => import('./pages/StudentCreate'));
 const StudentDetail = lazy(() => import('./pages/StudentDetail'));
 const StudentHome = lazy(() => import('./pages/StudentHome'));
+const Exercises = lazy(() => import('./pages/Exercises'));
+const Routines = lazy(() => import('./pages/Routines'));
+const RoutineCreate = lazy(() => import('./pages/RoutineCreate'));
+const RoutineDetail = lazy(() => import('./pages/RoutineDetail'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 function Home() {
@@ -38,6 +42,10 @@ export default function App() {
                     <Route path="alumnos" element={<Students />} />
                     <Route path="alumnos/nuevo" element={<StudentCreate />} />
                     <Route path="alumnos/:id" element={<StudentDetail />} />
+                    <Route path="ejercicios" element={<Exercises />} />
+                    <Route path="rutinas" element={<Routines />} />
+                    <Route path="rutinas/nueva" element={<RoutineCreate />} />
+                    <Route path="rutinas/:id" element={<RoutineDetail />} />
                   </Route>
                   <Route path="*" element={<NotFound />} />
                 </Route>

@@ -1,8 +1,8 @@
-import { MailPlus, Pencil, UserCheck, UserX } from 'lucide-react';
+import { ClipboardList, MailPlus, Pencil, UserCheck, UserX } from 'lucide-react';
 import { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { Badge } from '../components/ui/Badge';
-import { Button } from '../components/ui/Button';
+import { Button, LinkButton } from '../components/ui/Button';
 import { Card, StatCard } from '../components/ui/Card';
 import { ErrorState, LoadingBlock } from '../components/ui/Feedback';
 import { PageHeader } from '../components/ui/PageHeader';
@@ -51,6 +51,7 @@ export default function StudentDetail() {
           <>
             <Badge tone={STATUS_TONE[data.status]}>{STATUS_LABEL[data.status]}</Badge>
             <Button variant="secondary" icon={<Pencil size={16} aria-hidden="true" />} onClick={() => setEditing(true)}>Editar</Button>
+            <LinkButton to={`/rutinas/nueva?alumno=${data.id}`} variant="secondary" icon={<ClipboardList size={16} aria-hidden="true" />}>Nueva rutina</LinkButton>
             {data.status === 'pending' && <Button variant="secondary" icon={<MailPlus size={16} aria-hidden="true" />} loading={busy} onClick={() => void run(() => studentsApi.resendInvite(data.id), 'Invitación reenviada.')}>Reenviar invitación</Button>}
             {data.status === 'inactive'
               ? <Button icon={<UserCheck size={16} aria-hidden="true" />} loading={busy} onClick={() => void run(() => studentsApi.reactivate(data.id), 'Alumno reactivado.')}>Reactivar</Button>
@@ -61,7 +62,7 @@ export default function StudentDetail() {
 
       <div className={p.stack}>
         <div className={p.statGrid}>
-          <StatCard label="Rutinas activas" value={st.activeRoutines} />
+          <StatCard label="Rutinas activas" value={st.activeRoutines} hint={<Link to={`/rutinas?alumno=${data.id}`}>Ver rutinas</Link>} />
           <StatCard label="Último entrenamiento" value={st.lastWorkoutAt ? formatDate(st.lastWorkoutAt) : '—'} hint={st.lastWorkoutAt ? undefined : 'Todavía no registró entrenamientos'} />
           <StatCard label="Próximo turno" value={st.nextAppointment ? formatDateTime(st.nextAppointment.start) : '—'} hint={st.nextAppointment?.status} />
           <StatCard label="Membresía" value={st.membership ? `Hasta ${formatDate(st.membership.endDate)}` : '—'} hint={st.membership ? st.membership.status : 'Sin membresía vigente'} />

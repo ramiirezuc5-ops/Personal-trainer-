@@ -1,4 +1,4 @@
-import type { Dashboard, Paged, Student, StudentDetail, StudentInput, User } from '../types/api';
+import type { Dashboard, Exercise, ExerciseInput, Paged, RoutineCore, RoutineDetail, RoutineInput, RoutineStatus, RoutineSummary, Student, StudentDetail, StudentInput, User } from '../types/api';
 import { api } from './api';
 
 export const authApi = {
@@ -25,4 +25,22 @@ export const studentsApi = {
 export const meApi = {
   profile: () => api.get<Student>('/me/profile'),
   updateProfile: (patch: Partial<Pick<StudentInput, 'phone' | 'birthDate' | 'goal' | 'availability'>>) => api.patch<Student>('/me/profile', patch),
+};
+
+export interface ExerciseListParams { q?: string; muscleGroup?: string; archived?: boolean; page?: number; limit?: number }
+export const exercisesApi = {
+  list: (params: ExerciseListParams) => api.get<Paged<Exercise>>('/exercises', { ...params, archived: params.archived ? 'true' : 'false' }),
+  create: (input: ExerciseInput) => api.post<Exercise>('/exercises', input),
+  update: (id: string, input: Partial<ExerciseInput>) => api.patch<Exercise>(`/exercises/${id}`, input),
+  archive: (id: string) => api.post<Exercise>(`/exercises/${id}/archive`),
+  restore: (id: string) => api.post<Exercise>(`/exercises/${id}/restore`),
+};
+
+export interface RoutineListParams { student?: string; status?: string; page?: number; limit?: number }
+export const routinesApi = {
+  list: (params: RoutineListParams) => api.get<Paged<RoutineSummary>>('/routines', { ...params }),
+  get: (id: string) => api.get<RoutineDetail>(`/routines/${id}`),
+  create: (input: RoutineInput) => api.post<RoutineDetail>('/routines', input),
+  update: (id: string, patch: Partial<RoutineCore>) => api.patch<RoutineDetail>(`/routines/${id}`, patch),
+  setStatus: (id: string, status: RoutineStatus) => api.post<RoutineSummary>(`/routines/${id}/status`, { status }),
 };

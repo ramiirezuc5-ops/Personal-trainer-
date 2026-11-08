@@ -1,3 +1,5 @@
+import type { Difficulty, MuscleGroup, RoutineStatus } from '../types/api';
+
 const LOCALE = 'es-AR';
 
 export function money(amount: number, currency = 'ARS'): string {
@@ -23,3 +25,15 @@ export const isEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
 
 export const STATUS_LABEL = { active: 'Activo', inactive: 'Inactivo', pending: 'Pendiente' } as const;
 export const LEVEL_LABEL = { principiante: 'Principiante', intermedio: 'Intermedio', avanzado: 'Avanzado' } as const;
+
+export const MUSCLE_LABEL: Record<MuscleGroup, string> = {
+  pecho: 'Pecho', espalda: 'Espalda', hombros: 'Hombros', biceps: 'Bíceps', triceps: 'Tríceps', piernas: 'Piernas',
+  gluteos: 'Glúteos', core: 'Core', cardio: 'Cardio', cuerpo_completo: 'Cuerpo completo', movilidad: 'Movilidad',
+};
+// 0 = domingo (igual que el servidor). Se muestran de lunes a domingo.
+export const DAY_LABEL = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+export const DAY_ORDER = [1, 2, 3, 4, 5, 6, 0];
+export const ROUTINE_STATUS_LABEL: Record<RoutineStatus, string> = { borrador: 'Borrador', activa: 'Activa', finalizada: 'Finalizada', archivada: 'Archivada' };
+export const DIFFICULTY_LABEL: Record<Difficulty, string> = { baja: 'Baja', media: 'Media', alta: 'Alta' };
+// Fecha de hoy según la zona horaria del navegador, como AAAA-MM-DD (para inputs de tipo date).
+export const todayISO = () => new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
