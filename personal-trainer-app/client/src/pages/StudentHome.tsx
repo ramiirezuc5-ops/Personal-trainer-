@@ -55,13 +55,14 @@ export default function StudentHome() {
     <>
       <PageHeader title={`Hola, ${data.firstName}`} description="Tu perfil de entrenamiento." />
       <div className={p.stack}>
-        <Alert tone="info">Tu rutina, tus turnos, tu progreso y el estado de tu membresía estarán disponibles en las próximas versiones de la aplicación.</Alert>
+        <Alert tone="info">Tus turnos y tu progreso estarán disponibles en las próximas versiones de la aplicación.</Alert>
         <Card title="Mis datos">
           <dl className={p.dl}>
             <div><dt>Nombre</dt><dd>{data.firstName} {data.lastName}</dd></div>
             <div><dt>Correo</dt><dd>{data.email}</dd></div>
             <div><dt>Nivel</dt><dd>{LEVEL_LABEL[data.experienceLevel]}</dd></div>
-            <div><dt>Alta</dt><dd>{formatDate(data.joinedAt)}</dd></div>
+            <div><dt>Objetivo</dt><dd>{data.goal || '—'}</dd></div>
+            <div><dt>Fecha de ingreso</dt><dd>{formatDate(data.joinedAt)}</dd></div>
           </dl>
         </Card>
         <Card title="Datos que podés editar"><ProfileForm me={data} onSaved={reload} /></Card>

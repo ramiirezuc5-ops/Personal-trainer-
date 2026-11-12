@@ -1,4 +1,4 @@
-import { ClipboardList, Dumbbell, LayoutDashboard, LogOut, Menu, UserRound, Users, X, type LucideIcon } from 'lucide-react';
+import { ClipboardList, Dumbbell, LayoutDashboard, LogOut, Menu, UserRound, Users, Wallet, X, type LucideIcon } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
@@ -13,7 +13,11 @@ const TRAINER_NAV: NavItem[] = [
   { to: '/rutinas', label: 'Rutinas', icon: ClipboardList },
   { to: '/ejercicios', label: 'Ejercicios', icon: Dumbbell },
 ];
-const STUDENT_NAV: NavItem[] = [{ to: '/', label: 'Mi perfil', icon: UserRound, end: true }];
+const STUDENT_NAV: NavItem[] = [
+  { to: '/mi-rutina', label: 'Mi rutina', icon: ClipboardList },
+  { to: '/mis-pagos', label: 'Mi mensualidad', icon: Wallet },
+  { to: '/mi-perfil', label: 'Mi perfil', icon: UserRound, end: true },
+];
 
 function Brand() {
   return <NavLink to="/" className={s.brand}><span className={s.brandMark}><Dumbbell size={18} aria-hidden="true" /></span>Personal Trainer</NavLink>;

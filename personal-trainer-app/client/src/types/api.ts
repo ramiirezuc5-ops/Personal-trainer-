@@ -72,3 +72,31 @@ export interface RoutineDetail extends Omit<RoutineSummary, 'dayCount'> {
     exercises: { _id: string; exercise: RoutineExerciseRef | null; sets: number; reps: string; weight?: { value?: number; unit: WeightUnit }; restSeconds: number; notes: string }[];
   }[];
 }
+
+/* ---------- Vista del alumno ---------- */
+export type MyRoutineSummary = Omit<RoutineSummary, 'dayCount'> & { days: { _id: string; dayOfWeek: number; label: string }[] };
+
+export interface WorkoutRecord {
+  _id: string; routine: { _id: string; name: string } | null; dayId: string; performedAt: string;
+  exercises: { exercise: { _id: string; name: string } | null; completed: boolean; sets: { reps?: number; weight?: number; unit?: WeightUnit }[] }[];
+  durationMinutes?: number; notes: string;
+}
+export interface WorkoutInput {
+  routine: string; dayId: string; performedAt?: string; durationMinutes?: number; notes?: string; clientRequestId: string;
+  exercises: { exercise: string; completed: boolean; sets?: { reps: number; weight?: number; unit?: WeightUnit }[] }[];
+}
+export interface Compliance { expected: number; completed: number; percentage: number | null }
+
+/* ---------- Mensualidad y pagos (alumno) ---------- */
+export type MembershipStatus = 'pendiente' | 'activa' | 'vencida' | 'cancelada';
+export type PaymentMethod = 'efectivo' | 'transferencia' | 'tarjeta' | 'otro';
+export interface MyMembership {
+  _id: string; plan: { _id: string; name: string } | null; priceSnapshot: { amount: number; currency: string };
+  startDate: string; endDate: string; status: MembershipStatus; discount?: { amount: number; reason?: string };
+  paid: number; owed: number; due: number;
+}
+export interface MyPayment {
+  _id: string; membership: string | null; amount: number; currency: string; paidAt: string; method: PaymentMethod;
+  periodStart?: string; periodEnd?: string; status: 'registrado' | 'anulado';
+}
+export interface MyBilling { memberships: MyMembership[]; payments: MyPayment[] }

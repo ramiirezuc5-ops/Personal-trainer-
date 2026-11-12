@@ -1,4 +1,4 @@
-import type { Difficulty, MuscleGroup, RoutineStatus } from '../types/api';
+import type { Difficulty, MembershipStatus, MuscleGroup, PaymentMethod, RoutineStatus } from '../types/api';
 
 const LOCALE = 'es-AR';
 
@@ -37,3 +37,6 @@ export const ROUTINE_STATUS_LABEL: Record<RoutineStatus, string> = { borrador: '
 export const DIFFICULTY_LABEL: Record<Difficulty, string> = { baja: 'Baja', media: 'Media', alta: 'Alta' };
 // Fecha de hoy según la zona horaria del navegador, como AAAA-MM-DD (para inputs de tipo date).
 export const todayISO = () => new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+
+export const MEMBERSHIP_LABEL: Record<MembershipStatus, string> = { pendiente: 'Por comenzar', activa: 'Activa', vencida: 'Vencida', cancelada: 'Cancelada' };
+export const PAYMENT_METHOD_LABEL: Record<PaymentMethod, string> = { efectivo: 'Efectivo', transferencia: 'Transferencia', tarjeta: 'Tarjeta', otro: 'Otro' };

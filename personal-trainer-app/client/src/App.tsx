@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { LoadingBlock } from './components/ui/Feedback';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
@@ -18,11 +18,17 @@ const Exercises = lazy(() => import('./pages/Exercises'));
 const Routines = lazy(() => import('./pages/Routines'));
 const RoutineCreate = lazy(() => import('./pages/RoutineCreate'));
 const RoutineDetail = lazy(() => import('./pages/RoutineDetail'));
+const MyRoutines = lazy(() => import('./pages/MyRoutines'));
+const MyRoutineDetail = lazy(() => import('./pages/MyRoutineDetail'));
+const WorkoutLogPage = lazy(() => import('./pages/WorkoutLogPage'));
+const MyBilling = lazy(() => import('./pages/MyBilling'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 function Home() {
   const { user } = useAuth();
-  return user?.role === 'trainer' ? <Dashboard /> : <StudentHome />;
+  if (user?.role === 'trainer') return <Dashboard />;
+  // El alumno aterriza en su rutina; su perfil queda en /mi-perfil.
+  return user?.role === 'student' ? <Navigate to="/mi-rutina" replace /> : null;
 }
 
 export default function App() {
@@ -46,6 +52,13 @@ export default function App() {
                     <Route path="rutinas" element={<Routines />} />
                     <Route path="rutinas/nueva" element={<RoutineCreate />} />
                     <Route path="rutinas/:id" element={<RoutineDetail />} />
+                  </Route>
+                  <Route element={<RoleGate role="student" />}>
+                    <Route path="mi-rutina" element={<MyRoutines />} />
+                    <Route path="mi-rutina/:id" element={<MyRoutineDetail />} />
+                    <Route path="mi-rutina/:id/registrar/:dayId" element={<WorkoutLogPage />} />
+                    <Route path="mis-pagos" element={<MyBilling />} />
+                    <Route path="mi-perfil" element={<StudentHome />} />
                   </Route>
                   <Route path="*" element={<NotFound />} />
                 </Route>

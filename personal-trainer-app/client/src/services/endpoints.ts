@@ -1,4 +1,4 @@
-import type { Dashboard, Exercise, ExerciseInput, Paged, RoutineCore, RoutineDetail, RoutineInput, RoutineStatus, RoutineSummary, Student, StudentDetail, StudentInput, User } from '../types/api';
+import type { Compliance, Dashboard, MyBilling, Exercise, ExerciseInput, MyRoutineSummary, Paged, RoutineCore, RoutineDetail, RoutineInput, RoutineStatus, RoutineSummary, Student, StudentDetail, StudentInput, User, WorkoutInput, WorkoutRecord } from '../types/api';
 import { api } from './api';
 
 export const authApi = {
@@ -25,6 +25,12 @@ export const studentsApi = {
 export const meApi = {
   profile: () => api.get<Student>('/me/profile'),
   updateProfile: (patch: Partial<Pick<StudentInput, 'phone' | 'birthDate' | 'goal' | 'availability'>>) => api.patch<Student>('/me/profile', patch),
+  routines: () => api.get<MyRoutineSummary[]>('/me/routines'),
+  routine: (id: string) => api.get<RoutineDetail>(`/me/routines/${id}`),
+  logWorkout: (input: WorkoutInput) => api.post<WorkoutRecord & { duplicate: boolean }>('/me/workouts', input),
+  workouts: (params: { page?: number; limit?: number } = {}) => api.get<Paged<WorkoutRecord>>('/me/workouts', { ...params }),
+  compliance: (from: string, to: string) => api.get<Compliance>('/me/compliance', { from, to }),
+  billing: () => api.get<MyBilling>('/me/billing'),
 };
 
 export interface ExerciseListParams { q?: string; muscleGroup?: string; archived?: boolean; page?: number; limit?: number }
