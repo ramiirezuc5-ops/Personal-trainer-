@@ -10,7 +10,7 @@ import { Pagination } from '../components/ui/Pagination';
 import { useAsync } from '../hooks/useAsync';
 import { routinesApi, studentsApi } from '../services/endpoints';
 import type { RoutineStatus } from '../types/api';
-import { DIFFICULTY_LABEL, formatDate, ROUTINE_STATUS_LABEL } from '../utils/format';
+import { DIFFICULTY_LABEL, formatCalendarDate, ROUTINE_STATUS_LABEL } from '../utils/format';
 import p from './pages.module.css';
 
 export const ROUTINE_TONE: Record<RoutineStatus, Tone> = { borrador: 'neutral', activa: 'success', finalizada: 'info', archivada: 'neutral' };
@@ -71,7 +71,7 @@ export default function Routines() {
                 <div className={p.rowMeta}>
                   <span>{r.dayCount} {r.dayCount === 1 ? 'día' : 'días'}</span>
                   <span>Dificultad {DIFFICULTY_LABEL[r.difficulty].toLowerCase()}</span>
-                  <span>Desde {formatDate(r.startDate)}</span>
+                  <span>Desde {formatCalendarDate(r.startDate)}</span>
                   <Badge tone={ROUTINE_TONE[r.status]}>{ROUTINE_STATUS_LABEL[r.status]}</Badge>
                 </div>
               </Link>

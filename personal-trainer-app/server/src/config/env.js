@@ -13,6 +13,8 @@ const schema = z.object({
   ACCESS_TOKEN_TTL_MIN: z.coerce.number().int().positive().default(15),
   REFRESH_TOKEN_TTL_DAYS: z.coerce.number().int().positive().default(7),
   CLIENT_URL: z.string().url('CLIENT_URL debe ser una URL válida').transform((u) => u.replace(/\/$/, '')),
+  // Opcional: origen de la app de los alumnos cuando se publica como un sitio aparte. Si queda vacío, se usa CLIENT_URL.
+  STUDENT_URL: z.string().optional().transform((v) => (v ? v.trim().replace(/\/$/, '') : undefined)).refine((v) => !v || /^https?:\/\/[^\s]+$/.test(v), 'STUDENT_URL debe ser una URL válida'),
   COOKIE_SAMESITE: z.enum(['lax', 'strict', 'none']).default('lax'),
   COOKIE_SECURE: bool.default('false'),
   COOKIE_DOMAIN: z.string().optional().transform((v) => v || undefined),
@@ -31,7 +33,9 @@ if (!parsed.success) {
   throw new Error(`Configuración de entorno inválida:\n${lines}\nRevisá tu archivo .env (ver .env.example).`);
 }
 
-export const env = Object.freeze(parsed.data);
+const studentUrl = parsed.data.STUDENT_URL ?? parsed.data.CLIENT_URL;
+// CLIENT_URL = panel del entrenador; STUDENT_URL = app de los alumnos. Ambos orígenes pueden llamar a la API.
+export const env = Object.freeze({ ...parsed.data, STUDENT_URL: studentUrl, ALLOWED_ORIGINS: Object.freeze([...new Set([parsed.data.CLIENT_URL, studentUrl])]) });
 
 if (env.NODE_ENV === 'production') {
   if (!env.COOKIE_SECURE) throw new Error('En producción COOKIE_SECURE debe ser "true" (HTTPS).');

@@ -1,14 +1,15 @@
 import { ClipboardList, Wallet, TrendingUp } from 'lucide-react';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Badge } from '../components/ui/Badge';
 import { Card, StatCard } from '../components/ui/Card';
 import { EmptyState, ErrorState, LoadingBlock } from '../components/ui/Feedback';
 import { PageHeader } from '../components/ui/PageHeader';
 import { useAsync } from '../hooks/useAsync';
+import { useRefreshOnFocus } from '../hooks/useRefreshOnFocus';
 import { meApi } from '../services/endpoints';
 import { currentMembership, pendingMemberships } from '../utils/billing';
-import { DAY_LABEL, DAY_ORDER, formatDate, MEMBERSHIP_LABEL, money, ROUTINE_STATUS_LABEL } from '../utils/format';
+import { DAY_LABEL, DAY_ORDER, formatCalendarDate, formatDate, MEMBERSHIP_LABEL, money, ROUTINE_STATUS_LABEL } from '../utils/format';
 import { ROUTINE_TONE } from './Routines';
 import p from './pages.module.css';
 
@@ -20,6 +21,9 @@ export default function MyRoutines() {
   const compliance = useAsync(() => meApi.compliance(range.from, range.to), [range]);
   const workouts = useAsync(() => meApi.workouts({ limit: 8 }), []);
   const billing = useAsync(() => meApi.billing(), []);
+
+  const refreshAll = useCallback(() => { routines.reload(); compliance.reload(); workouts.reload(); billing.reload(); }, [routines.reload, compliance.reload, workouts.reload, billing.reload]); // eslint-disable-line react-hooks/exhaustive-deps
+  useRefreshOnFocus(refreshAll);
 
   const c = compliance.data;
   const percentage = c?.percentage;
@@ -67,7 +71,7 @@ export default function MyRoutines() {
                   <span className={p.rowMeta}><span>{days}</span>{r.goal && <span>· {r.goal}</span>}</span>
                 </div>
                 <div className={p.rowMeta}>
-                  <span>Desde {formatDate(r.startDate)}</span>
+                  <span>Desde {formatCalendarDate(r.startDate)}</span>
                   <Badge tone={ROUTINE_TONE[r.status]}>{ROUTINE_STATUS_LABEL[r.status]}</Badge>
                 </div>
               </Link>

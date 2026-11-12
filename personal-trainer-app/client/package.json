@@ -5,7 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:trainer": "vite --mode trainer",
+    "dev:student": "vite --mode student",
     "build": "tsc --noEmit && vite build",
+    "build:trainer": "tsc --noEmit && vite build --mode trainer",
+    "build:student": "tsc --noEmit && vite build --mode student",
     "preview": "vite preview",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",

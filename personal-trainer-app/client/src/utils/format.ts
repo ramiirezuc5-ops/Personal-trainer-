@@ -40,3 +40,8 @@ export const todayISO = () => new Date(Date.now() - new Date().getTimezoneOffset
 
 export const MEMBERSHIP_LABEL: Record<MembershipStatus, string> = { pendiente: 'Por comenzar', activa: 'Activa', vencida: 'Vencida', cancelada: 'Cancelada' };
 export const PAYMENT_METHOD_LABEL: Record<PaymentMethod, string> = { efectivo: 'Efectivo', transferencia: 'Transferencia', tarjeta: 'Tarjeta', otro: 'Otro' };
+
+// Las fechas "de calendario" (inicio/fin de rutina, nacimiento) se guardan a medianoche UTC: se muestran en UTC para no correrse un día.
+export const formatCalendarDate = (iso: string | null | undefined) => formatDate(iso, 'UTC');
+// Mediodía local de una fecha AAAA-MM-DD, en ISO: evita que la fecha se corra de día por la zona horaria.
+export const localNoonISO = (date: string) => new Date(`${date}T12:00:00`).toISOString();

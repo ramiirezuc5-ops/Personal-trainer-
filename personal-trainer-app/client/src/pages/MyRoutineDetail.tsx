@@ -6,15 +6,17 @@ import { Card } from '../components/ui/Card';
 import { ErrorState, LoadingBlock } from '../components/ui/Feedback';
 import { PageHeader } from '../components/ui/PageHeader';
 import { useAsync } from '../hooks/useAsync';
+import { useRefreshOnFocus } from '../hooks/useRefreshOnFocus';
 import { ApiError } from '../services/api';
 import { meApi } from '../services/endpoints';
-import { DAY_LABEL, DAY_ORDER, DIFFICULTY_LABEL, formatDate, MUSCLE_LABEL, ROUTINE_STATUS_LABEL } from '../utils/format';
+import { DAY_LABEL, DAY_ORDER, DIFFICULTY_LABEL, formatCalendarDate, MUSCLE_LABEL, ROUTINE_STATUS_LABEL } from '../utils/format';
 import p from './pages.module.css';
 import { ROUTINE_TONE } from './Routines';
 
 export default function MyRoutineDetail() {
   const { id = '' } = useParams();
   const { data, error, loading, reload } = useAsync(() => meApi.routine(id), [id]);
+  useRefreshOnFocus(reload);
 
   if (loading && !data) return <LoadingBlock label="Cargando rutina…" />;
   if (error != null && !data) {
@@ -37,8 +39,8 @@ export default function MyRoutineDetail() {
           <dl className={p.dl}>
             <div><dt>Dificultad</dt><dd>{DIFFICULTY_LABEL[data.difficulty]}</dd></div>
             <div><dt>Duración estimada</dt><dd>{data.estimatedMinutes ? `${data.estimatedMinutes} min` : '—'}</dd></div>
-            <div><dt>Inicio</dt><dd>{formatDate(data.startDate)}</dd></div>
-            <div><dt>Fin</dt><dd>{data.endDate ? formatDate(data.endDate) : 'Sin fecha de fin'}</dd></div>
+            <div><dt>Inicio</dt><dd>{formatCalendarDate(data.startDate)}</dd></div>
+            <div><dt>Fin</dt><dd>{data.endDate ? formatCalendarDate(data.endDate) : 'Sin fecha de fin'}</dd></div>
             {data.description && <div style={{ gridColumn: '1 / -1' }}><dt>Indicaciones de tu entrenador</dt><dd style={{ whiteSpace: 'pre-line' }}>{data.description}</dd></div>}
           </dl>
         </Card>

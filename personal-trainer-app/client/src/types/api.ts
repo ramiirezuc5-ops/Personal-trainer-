@@ -100,3 +100,15 @@ export interface MyPayment {
   periodStart?: string; periodEnd?: string; status: 'registrado' | 'anulado';
 }
 export interface MyBilling { memberships: MyMembership[]; payments: MyPayment[] }
+
+/* ---------- Planes y pagos (entrenador) ---------- */
+export interface Plan { _id: string; name: string; description: string; price: number; currency: string; durationDays: number; sessionsIncluded: number | null; active: boolean }
+export interface PlanInput { name: string; description?: string; price: number; durationDays: number; sessionsIncluded?: number | null }
+export interface MembershipInput { plan: string; startDate?: string; discount?: { amount: number; reason?: string }; notes?: string }
+export interface PaymentInput { amount: number; method: PaymentMethod; paidAt?: string; membership?: string; notes?: string }
+export interface PaymentRow {
+  _id: string; student: { _id: string; firstName: string; lastName: string } | null; membership: string | null;
+  amount: number; currency: string; paidAt: string; method: PaymentMethod; status: 'registrado' | 'anulado'; notes: string; voided?: { reason?: string };
+}
+export interface PendingRow { _id: string; status: MembershipStatus; endDate: string; due: number; currency: string; student: { id: string; firstName: string; lastName: string } }
+export interface RevenueSummary { timezone: string; byMonth: { month: string; currency: string; total: number; count: number }[]; totals: { currency: string; total: number; count: number }[] }

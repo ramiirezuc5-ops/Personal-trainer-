@@ -3,6 +3,7 @@ import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
 import { TextField } from '../components/ui/Field';
 import { Alert } from '../components/ui/Feedback';
+import { APP_MODE } from '../appMode';
 import { useAuth } from '../context/AuthContext';
 import { AuthShell } from '../layouts/AuthShell';
 import s from '../layouts/layout.module.css';
@@ -16,6 +17,12 @@ const MESSAGES: Record<string, string> = {
   ACCOUNT_INACTIVE: 'Tu cuenta está inactiva. Contactá a tu entrenador.',
   RATE_LIMITED: 'Demasiados intentos. Esperá unos minutos e intentá de nuevo.',
 };
+
+const SUBTITLE = {
+  trainer: 'Panel del entrenador: gestioná tus alumnos, rutinas y pagos.',
+  student: 'Accedé a tu rutina, tus entrenamientos y tu mensualidad.',
+  all: 'Accedé a tu cuenta para gestionar tu entrenamiento.',
+} as const;
 
 export default function Login() {
   const { login, status } = useAuth();
@@ -51,7 +58,7 @@ export default function Login() {
   }
 
   return (
-    <AuthShell title="Ingresar" subtitle="Accedé a tu cuenta para gestionar tu entrenamiento." footer={<Link to="/recuperar">Olvidé mi contraseña</Link>}>
+    <AuthShell title="Ingresar" subtitle={SUBTITLE[APP_MODE]} footer={<Link to="/recuperar">Olvidé mi contraseña</Link>}>
       <form className={s.form} onSubmit={(e) => void onSubmit(e)} noValidate>
         {serverError && <Alert tone="danger">{serverError}</Alert>}
         <TextField label="Correo electrónico" type="email" name="email" autoComplete="email" inputMode="email" value={email} onChange={(e) => setEmail(e.target.value)} error={errors.email} required />

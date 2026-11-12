@@ -1,4 +1,4 @@
-import { ClipboardList, Dumbbell, LayoutDashboard, LogOut, Menu, UserRound, Users, Wallet, X, type LucideIcon } from 'lucide-react';
+import { ClipboardList, Dumbbell, LayoutDashboard, LogOut, Menu, Package, UserRound, Users, Wallet, X, type LucideIcon } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
@@ -12,6 +12,8 @@ const TRAINER_NAV: NavItem[] = [
   { to: '/alumnos', label: 'Alumnos', icon: Users },
   { to: '/rutinas', label: 'Rutinas', icon: ClipboardList },
   { to: '/ejercicios', label: 'Ejercicios', icon: Dumbbell },
+  { to: '/pagos', label: 'Pagos', icon: Wallet },
+  { to: '/planes', label: 'Planes', icon: Package },
 ];
 const STUDENT_NAV: NavItem[] = [
   { to: '/mi-rutina', label: 'Mi rutina', icon: ClipboardList },

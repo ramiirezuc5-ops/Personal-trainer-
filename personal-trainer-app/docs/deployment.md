@@ -47,3 +47,16 @@ El modelo `Payment` ya separa `source: 'provider'` e impide duplicados por `prov
 3. **Cookies de sesión:** el frontend llama a `/api/v1/...` en su mismo dominio. Copiá `client/vercel.example.json` a `client/vercel.json` y reemplazá `TU-BACKEND.example.com` por la URL del backend: así el hosting reenvía `/api/*` y las cookies quedan del mismo sitio (`SameSite=Lax`).
 4. En el backend: `CLIENT_URL` = URL pública exacta del frontend (por ejemplo `https://app.tu-dominio.com`) y `COOKIE_SECURE=true`.
 5. Verificar: abrir la app, ingresar, y en las herramientas del navegador comprobar que las cookies `pt_at`/`pt_rt` tienen `HttpOnly` y `Secure` y que no hay errores en consola.
+
+## 9. Dos sitios: panel del entrenador y app de los alumnos
+Un mismo proyecto (`client`) se compila **dos veces**, una por cada público:
+
+| Sitio | Comando | Carpeta generada | Variable del backend |
+|---|---|---|---|
+| Panel del entrenador | `npm run build:trainer` | `client/dist-trainer` | `CLIENT_URL` |
+| App de los alumnos | `npm run build:student` | `client/dist-student` | `STUDENT_URL` |
+
+1. Publicá cada carpeta como un sitio distinto (por ejemplo `entrenador.tu-dominio.com` y `alumnos.tu-dominio.com`). En cada uno copiá `client/vercel.example.json` a `vercel.json` con el mismo reenvío de `/api/*` al backend, para que las cookies queden del mismo sitio.
+2. En el backend: `CLIENT_URL` = dirección exacta del panel y `STUDENT_URL` = dirección exacta de la app de alumnos (ambas sin barra final). Las dos quedan habilitadas para CORS/CSRF y los enlaces de invitación y de recuperación apuntan al sitio que le corresponde a cada persona.
+3. Opcional: definí `VITE_STUDENT_APP_URL` (en el panel) y `VITE_TRAINER_APP_URL` (en la app de alumnos) como variables de entorno del build, para que la pantalla de "sitio equivocado" muestre un enlace al sitio correcto.
+4. Cada sitio solo muestra las pantallas de su rol. **La seguridad real sigue en el backend**: aunque alguien abra el sitio equivocado, la API valida el rol en cada pedido.

@@ -1,4 +1,4 @@
-import type { Compliance, Dashboard, MyBilling, Exercise, ExerciseInput, MyRoutineSummary, Paged, RoutineCore, RoutineDetail, RoutineInput, RoutineStatus, RoutineSummary, Student, StudentDetail, StudentInput, User, WorkoutInput, WorkoutRecord } from '../types/api';
+import type { Compliance, Dashboard, MembershipInput, MyBilling, MyMembership, PaymentInput, PaymentRow, PendingRow, Plan, PlanInput, RevenueSummary, Exercise, ExerciseInput, MyRoutineSummary, Paged, RoutineCore, RoutineDetail, RoutineInput, RoutineStatus, RoutineSummary, Student, StudentDetail, StudentInput, User, WorkoutInput, WorkoutRecord } from '../types/api';
 import { api } from './api';
 
 export const authApi = {
@@ -49,4 +49,18 @@ export const routinesApi = {
   create: (input: RoutineInput) => api.post<RoutineDetail>('/routines', input),
   update: (id: string, patch: Partial<RoutineCore>) => api.patch<RoutineDetail>(`/routines/${id}`, patch),
   setStatus: (id: string, status: RoutineStatus) => api.post<RoutineSummary>(`/routines/${id}/status`, { status }),
+};
+
+export const billingApi = {
+  plans: (includeInactive: boolean) => api.get<Plan[]>('/billing/plans', { includeInactive: includeInactive ? 'true' : 'false' }),
+  createPlan: (input: PlanInput) => api.post<Plan>('/billing/plans', input),
+  updatePlan: (id: string, patch: Partial<PlanInput> & { active?: boolean }) => api.patch<Plan>(`/billing/plans/${id}`, patch),
+  memberships: (studentId: string) => api.get<MyMembership[]>(`/students/${studentId}/memberships`),
+  assignMembership: (studentId: string, input: MembershipInput) => api.post<MyMembership>(`/students/${studentId}/memberships`, input),
+  cancelMembership: (id: string) => api.post<MyMembership>(`/billing/memberships/${id}/cancel`),
+  createPayment: (studentId: string, input: PaymentInput) => api.post<PaymentRow>(`/students/${studentId}/payments`, input),
+  payments: (params: { page?: number; limit?: number } = {}) => api.get<Paged<PaymentRow>>('/billing/payments', { ...params }),
+  voidPayment: (id: string, reason: string) => api.post<PaymentRow>(`/billing/payments/${id}/void`, { reason }),
+  pending: () => api.get<PendingRow[]>('/billing/pending'),
+  summary: (from?: string, to?: string) => api.get<RevenueSummary>('/billing/summary', { from, to }),
 };

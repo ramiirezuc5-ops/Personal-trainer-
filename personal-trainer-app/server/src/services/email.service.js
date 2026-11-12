@@ -31,7 +31,9 @@ const wrap = (title, body) => `<div style="font-family:Arial,sans-serif;max-widt
 const btn = (url, label) => `<p><a href="${esc(url)}" style="background:#111;color:#fff;padding:12px 20px;text-decoration:none;border-radius:6px;display:inline-block">${esc(label)}</a></p>`;
 
 export function sendPasswordResetEmail(user, token) {
-  const url = `${env.CLIENT_URL}/restablecer-contrasena?token=${encodeURIComponent(token)}`;
+  // Cada persona recibe el enlace del sitio que le corresponde: alumnos → app de alumnos, entrenador → panel.
+  const base = user.role === 'student' ? env.STUDENT_URL : env.CLIENT_URL;
+  const url = `${base}/restablecer-contrasena?token=${encodeURIComponent(token)}`;
   return send({
     to: user.email, subject: `Restablecé tu contraseña — ${env.APP_NAME}`,
     text: `Para elegir una nueva contraseña ingresá a: ${url}\n\nEl enlace vence en 1 hora. Si no lo pediste, ignorá este mensaje.`,
@@ -40,7 +42,7 @@ export function sendPasswordResetEmail(user, token) {
 }
 
 export function sendInviteEmail(user, trainerName, token) {
-  const url = `${env.CLIENT_URL}/restablecer-contrasena?token=${encodeURIComponent(token)}&invitacion=1`;
+  const url = `${env.STUDENT_URL}/restablecer-contrasena?token=${encodeURIComponent(token)}&invitacion=1`; // las invitaciones son siempre para alumnos
   return send({
     to: user.email, subject: `${trainerName} te invitó a ${env.APP_NAME}`,
     text: `Hola ${user.name}, ${trainerName} creó tu cuenta. Activala eligiendo tu contraseña: ${url}\n\nEl enlace vence en 7 días.`,

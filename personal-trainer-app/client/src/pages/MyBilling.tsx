@@ -4,6 +4,7 @@ import { Card } from '../components/ui/Card';
 import { Alert, EmptyState, ErrorState, LoadingBlock } from '../components/ui/Feedback';
 import { PageHeader } from '../components/ui/PageHeader';
 import { useAsync } from '../hooks/useAsync';
+import { useRefreshOnFocus } from '../hooks/useRefreshOnFocus';
 import { meApi } from '../services/endpoints';
 import type { MembershipStatus } from '../types/api';
 import { currentMembership, daysUntil, pendingMemberships } from '../utils/billing';
@@ -23,6 +24,7 @@ function dueText(status: MembershipStatus, endDate: string): string {
 
 export default function MyBilling() {
   const { data, error, loading, reload } = useAsync(() => meApi.billing(), []);
+  useRefreshOnFocus(reload);
 
   if (loading && !data) return <LoadingBlock label="Cargando tu mensualidad…" />;
   if (error != null && !data) return <ErrorState error={error} onRetry={reload} />;

@@ -12,7 +12,7 @@ import { useAsync } from '../hooks/useAsync';
 import { ApiError } from '../services/api';
 import { exercisesApi, routinesApi, studentsApi } from '../services/endpoints';
 import type { RoutineDetail as Routine, RoutineStatus, StudentDetail } from '../types/api';
-import { DAY_LABEL, DAY_ORDER, DIFFICULTY_LABEL, formatDate, MUSCLE_LABEL, ROUTINE_STATUS_LABEL } from '../utils/format';
+import { DAY_LABEL, DAY_ORDER, DIFFICULTY_LABEL, formatCalendarDate, MUSCLE_LABEL, ROUTINE_STATUS_LABEL } from '../utils/format';
 import p from './pages.module.css';
 import { RoutineForm } from './RoutineForm';
 import { ROUTINE_TONE } from './Routines';
@@ -110,8 +110,8 @@ export default function RoutineDetail() {
               <div><dt>Objetivo</dt><dd>{data.goal || '—'}</dd></div>
               <div><dt>Dificultad</dt><dd>{DIFFICULTY_LABEL[data.difficulty]}</dd></div>
               <div><dt>Duración estimada</dt><dd>{data.estimatedMinutes ? `${data.estimatedMinutes} min` : '—'}</dd></div>
-              <div><dt>Inicio</dt><dd>{formatDate(data.startDate)}</dd></div>
-              <div><dt>Fin</dt><dd>{data.endDate ? formatDate(data.endDate) : 'Sin fecha de fin'}</dd></div>
+              <div><dt>Inicio</dt><dd>{formatCalendarDate(data.startDate)}</dd></div>
+              <div><dt>Fin</dt><dd>{data.endDate ? formatCalendarDate(data.endDate) : 'Sin fecha de fin'}</dd></div>
               <div style={{ gridColumn: '1 / -1' }}><dt>Descripción</dt><dd>{data.description || '—'}</dd></div>
             </dl>
           </Card>

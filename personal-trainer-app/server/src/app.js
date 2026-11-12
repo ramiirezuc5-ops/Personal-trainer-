@@ -23,7 +23,7 @@ export function createApp() {
   }));
   app.use(helmet());
   app.use(cors({
-    origin: (origin, cb) => cb(null, !origin || origin === env.CLIENT_URL), // sin cabecera CORS para otros orígenes
+    origin: (origin, cb) => cb(null, !origin || env.ALLOWED_ORIGINS.includes(origin)), // sin cabecera CORS para otros orígenes
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
     allowedHeaders: ['Content-Type', 'X-CSRF-Token'],

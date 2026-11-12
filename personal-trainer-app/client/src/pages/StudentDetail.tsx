@@ -11,8 +11,9 @@ import { useToast } from '../context/ToastContext';
 import { useAsync } from '../hooks/useAsync';
 import { ApiError } from '../services/api';
 import { studentsApi } from '../services/endpoints';
-import { formatDate, formatDateTime, LEVEL_LABEL, STATUS_LABEL } from '../utils/format';
+import { formatCalendarDate, formatDate, formatDateTime, LEVEL_LABEL, STATUS_LABEL } from '../utils/format';
 import p from './pages.module.css';
+import { StudentBilling } from './StudentBilling';
 import { StudentForm } from './StudentForm';
 import { STATUS_TONE } from './Students';
 
@@ -77,7 +78,7 @@ export default function StudentDetail() {
               <div><dt>Nivel</dt><dd>{LEVEL_LABEL[data.experienceLevel]}</dd></div>
               <div><dt>Objetivo</dt><dd>{data.goal || '—'}</dd></div>
               <div><dt>Teléfono</dt><dd>{data.phone || '—'}</dd></div>
-              <div><dt>Fecha de nacimiento</dt><dd>{formatDate(data.birthDate)}</dd></div>
+              <div><dt>Fecha de nacimiento</dt><dd>{formatCalendarDate(data.birthDate)}</dd></div>
               <div><dt>Disponibilidad</dt><dd>{data.availability || '—'}</dd></div>
               <div><dt>Alta</dt><dd>{formatDate(data.joinedAt)}</dd></div>
               <div><dt>Puede editar</dt><dd>{data.studentEditableFields.length ? data.studentEditableFields.map((f) => FIELD_LABEL[f] ?? f).join(', ') : 'Nada'}</dd></div>
@@ -86,6 +87,8 @@ export default function StudentDetail() {
           )}
         </Card>
       </div>
+
+      {!editing && <div style={{ marginTop: 'var(--space-4)' }}><StudentBilling studentId={data.id} studentName={`${data.firstName} ${data.lastName}`} onChanged={reload} /></div>}
 
       <ConfirmDialog open={confirm} danger loading={busy} title="¿Desactivar alumno?" confirmLabel="Desactivar"
         message={<>{data.firstName} no podrá ingresar a su cuenta. <strong>No se borra nada</strong>: su historial de rutinas, turnos, pagos y mediciones se conserva y podés reactivarlo cuando quieras.</>}
