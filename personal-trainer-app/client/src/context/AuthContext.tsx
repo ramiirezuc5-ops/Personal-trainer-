@@ -4,7 +4,7 @@ import { authApi } from '../services/endpoints';
 import type { User } from '../types/api';
 
 type Status = 'loading' | 'authenticated' | 'anonymous';
-interface AuthApi { user: User | null; status: Status; login: (email: string, password: string) => Promise<User>; logout: () => Promise<void> }
+interface AuthApi { user: User | null; status: Status; login: (email: string, password: string, portal?: 'trainer' | 'student') => Promise<User>; logout: () => Promise<void> }
 
 const AuthContext = createContext<AuthApi | null>(null);
 
@@ -28,8 +28,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => window.removeEventListener(AUTH_EXPIRED_EVENT, onExpired);
   }, []);
 
-  const login = useCallback(async (email: string, password: string) => {
-    const { user: u } = await authApi.login(email, password);
+  const login = useCallback(async (email: string, password: string, portal?: 'trainer' | 'student') => {
+    const { user: u } = await authApi.login(email, password, portal);
     setUser(u); setStatus('authenticated');
     return u;
   }, []);

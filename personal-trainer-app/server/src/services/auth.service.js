@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { env } from '../config/env.js';
-import { TOKEN_TYPES, USER_STATUS } from '../config/constants.js';
+import { ROLES, TOKEN_TYPES, USER_STATUS } from '../config/constants.js';
 import { AuthToken } from '../models/AuthToken.js';
 import { User } from '../models/User.js';
 import { AppError, badRequest, forbidden, unauthorized } from '../utils/errors.js';
@@ -35,7 +35,7 @@ export async function createSession(user, meta) {
   return { accessToken, refreshToken, csrfToken: randomToken(24) };
 }
 
-export async function login({ email, password }, meta) {
+export async function login({ email, password, portal }, meta) {
   const user = await User.findOne({ email }).select('+passwordHash +lockUntil');
   if (!user) {
     await bcrypt.compare(password, DUMMY_HASH);
@@ -51,6 +51,11 @@ export async function login({ email, password }, meta) {
       await User.updateOne({ _id: user._id }, { failedLoginCount: 0, lockUntil: new Date(Date.now() + LOCK_MINUTES * 60_000) });
     }
     throw unauthorized('Correo o contraseña incorrectos.', 'INVALID_CREDENTIALS');
+  }
+  // Logins separados: con la contraseña correcta pero desde la pestaña equivocada, no se abre sesión.
+  // (Recién acá se aclara el motivo, así no se revela si un correo existe a quien no tiene la contraseña.)
+  if (portal && user.role !== portal) {
+    throw forbidden(user.role === ROLES.STUDENT ? 'Esa cuenta es de alumno. Ingresá desde la pestaña «Alumno».' : 'Esa cuenta es de entrenador. Ingresá desde la pestaña «Entrenador».', 'WRONG_PORTAL');
   }
   if (user.status === USER_STATUS.PENDING) throw forbidden('Todavía no activaste tu cuenta. Revisá el correo de invitación.', 'ACCOUNT_PENDING');
   if (user.status !== USER_STATUS.ACTIVE) throw forbidden('Tu cuenta está inactiva. Contactá a tu entrenador.', 'ACCOUNT_INACTIVE');

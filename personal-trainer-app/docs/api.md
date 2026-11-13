@@ -8,7 +8,7 @@ Un recurso de otro usuario responde **404** (no se revela su existencia). Rol eq
 | Método | Ruta | Descripción |
 |---|---|---|
 | GET | `/auth/csrf` | Entrega cookie y token CSRF |
-| POST | `/auth/login` | Ingreso (límite: 10 intentos/15 min por IP+correo; bloqueo de cuenta tras 5 fallos) |
+| POST | `/auth/login` | Ingreso (límite: 10 intentos/15 min por IP+correo; bloqueo de cuenta tras 5 fallos). Campo opcional `portal` (`student` o `trainer`): si la cuenta es de otro rol responde `403 WRONG_PORTAL` y no abre sesión |
 | POST | `/auth/refresh` · `/auth/logout` | Renovar (rotativo) / cerrar sesión |
 | GET | `/auth/me` | Usuario actual (autenticado) |
 | POST | `/auth/forgot-password` | Envía enlace de recuperación (respuesta idéntica exista o no el correo) |

@@ -57,8 +57,20 @@ describe('Login', () => {
     await userEvent.type(await screen.findByLabelText(/Correo electrónico/), 'ana@test.com');
     await userEvent.type(screen.getByLabelText(/Contraseña/), 'Clave12345seg');
     await userEvent.click(screen.getByRole('button', { name: 'Ingresar' }));
-    await waitFor(() => expect(mocks.authApi.login).toHaveBeenCalledWith('ana@test.com', 'Clave12345seg'));
+    await waitFor(() => expect(mocks.authApi.login).toHaveBeenCalledWith('ana@test.com', 'Clave12345seg', 'student'));
     expect(await screen.findByText('INICIO')).toBeInTheDocument();
+  });
+
+  it('tiene pestañas Alumno y Entrenador, y envía la que se eligió', async () => {
+    mocks.authApi.login.mockResolvedValue({ user: studentUser });
+    renderApp(<Login />, { user: null, route: '/ingresar', path: '/ingresar' });
+    expect(await screen.findByRole('tab', { name: /Alumno/ })).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('tab', { name: /Entrenador/ }));
+    expect(screen.getByRole('tab', { name: /Entrenador/ })).toHaveAttribute('aria-selected', 'true');
+    await userEvent.type(screen.getByLabelText(/Correo electrónico/), 'prof@test.com');
+    await userEvent.type(screen.getByLabelText(/Contraseña/), 'Clave12345seg');
+    await userEvent.click(screen.getByRole('button', { name: 'Ingresar' }));
+    await waitFor(() => expect(mocks.authApi.login).toHaveBeenCalledWith('prof@test.com', 'Clave12345seg', 'trainer'));
   });
 });
 

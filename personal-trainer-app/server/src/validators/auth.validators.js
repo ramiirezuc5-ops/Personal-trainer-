@@ -11,7 +11,8 @@ export const emailSchema = z.string().trim().toLowerCase().email('Correo electr�
 const tokenSchema = z.string().min(20).max(200);
 
 // .strict() rechaza campos desconocidos (p. ej. "role") → protección contra asignación masiva.
-export const loginSchema = z.object({ email: emailSchema, password: z.string().min(1).max(200) }).strict();
+// `portal` indica desde qué pestaña se ingresa (alumno o entrenador). No asigna ningún rol: solo exige que la cuenta coincida.
+export const loginSchema = z.object({ email: emailSchema, password: z.string().min(1).max(200), portal: z.enum(['trainer', 'student']).optional() }).strict();
 export const changePasswordSchema = z.object({ currentPassword: z.string().min(1).max(200), newPassword: passwordSchema }).strict();
 export const forgotPasswordSchema = z.object({ email: emailSchema }).strict();
 // Sirve para recuperar la contraseña y para activar una cuenta invitada.

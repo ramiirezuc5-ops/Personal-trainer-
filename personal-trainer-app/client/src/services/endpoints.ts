@@ -2,7 +2,7 @@ import type { Compliance, Dashboard, MembershipInput, MyBilling, MyMembership, P
 import { api } from './api';
 
 export const authApi = {
-  login: (email: string, password: string) => api.post<{ user: User }>('/auth/login', { email, password }),
+  login: (email: string, password: string, portal?: 'trainer' | 'student') => api.post<{ user: User }>('/auth/login', { email, password, ...(portal ? { portal } : {}) }),
   logout: () => api.post<void>('/auth/logout'),
   me: () => api.get<{ user: User }>('/auth/me'),
   forgot: (email: string) => api.post<{ message: string }>('/auth/forgot-password', { email }),

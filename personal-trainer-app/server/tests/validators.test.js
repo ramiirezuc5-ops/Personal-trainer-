@@ -23,3 +23,9 @@ test('la nueva contraseña exige largo y combinación de letras y números', () 
 test('forgot-password valida el correo', () => {
   assert.equal(forgotPasswordSchema.safeParse({ email: 'no-es-correo' }).success, false);
 });
+
+test('login acepta el portal (alumno o entrenador) y rechaza cualquier otro valor', () => {
+  assert.equal(loginSchema.safeParse({ email: 'a@b.com', password: 'x', portal: 'student' }).success, true);
+  assert.equal(loginSchema.safeParse({ email: 'a@b.com', password: 'x', portal: 'trainer' }).success, true);
+  assert.equal(loginSchema.safeParse({ email: 'a@b.com', password: 'x', portal: 'admin' }).success, false);
+});
