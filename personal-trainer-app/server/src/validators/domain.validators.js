@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { MUSCLE_GROUPS } from '../models/Exercise.js';
+import { EXERCISE_DIFFICULTIES, MUSCLE_GROUPS } from '../models/Exercise.js';
 import { STUDENT_EDITABLE_FIELDS } from '../models/StudentProfile.js';
 import { paginationQuery } from '../utils/pagination.js';
 import { currencyCode, hhmm, isoDate, objectId, text } from '../utils/schemas.js';
@@ -28,8 +28,19 @@ export const exerciseCreate = z.object({
   name: text(100, 2), muscleGroup: z.enum(MUSCLE_GROUPS), description: text(500).optional(), equipment: text(100).optional(),
   instructions: text(1500).optional(), commonMistakes: text(800).optional(),
   media: z.object({ url: httpUrl, kind: z.enum(['image', 'video']) }).strict().optional(),
+  secondaryMuscles: z.array(z.enum(MUSCLE_GROUPS)).max(MUSCLE_GROUPS.length - 1).optional(),
+  difficulty: z.enum(EXERCISE_DIFFICULTIES).nullable().optional(),
+}).strict()
+  .refine((e) => !e.secondaryMuscles?.includes(e.muscleGroup), { message: 'El músculo secundario no puede repetir al principal.', path: ['secondaryMuscles'] })
+  .refine((e) => !e.secondaryMuscles || new Set(e.secondaryMuscles).size === e.secondaryMuscles.length, { message: 'No repitas el mismo músculo secundario.', path: ['secondaryMuscles'] });
+// exerciseCreate ya no es un ZodObject puro (tiene .refine), así que la versión editable se arma aparte con los mismos campos.
+export const exerciseUpdate = z.object({
+  name: text(100, 2).optional(), muscleGroup: z.enum(MUSCLE_GROUPS).optional(), description: text(500).optional(), equipment: text(100).optional(),
+  instructions: text(1500).optional(), commonMistakes: text(800).optional(),
+  media: z.object({ url: httpUrl, kind: z.enum(['image', 'video']) }).strict().optional(),
+  secondaryMuscles: z.array(z.enum(MUSCLE_GROUPS)).max(MUSCLE_GROUPS.length - 1).optional(),
+  difficulty: z.enum(EXERCISE_DIFFICULTIES).nullable().optional(),
 }).strict();
-export const exerciseUpdate = exerciseCreate.partial().strict();
 export const exerciseListQuery = z.object({
   q: text(80).optional(), muscleGroup: z.enum(MUSCLE_GROUPS).optional(),
   archived: z.enum(['true', 'false']).default('false').transform((v) => v === 'true'), ...paginationQuery,

@@ -12,13 +12,13 @@ import type { Student } from '../types/api';
 import { formatDate, LEVEL_LABEL } from '../utils/format';
 import p from './pages.module.css';
 
-type Editable = 'phone' | 'birthDate' | 'goal' | 'availability';
-const LABELS: Record<Editable, string> = { phone: 'Teléfono', birthDate: 'Fecha de nacimiento', goal: 'Objetivo', availability: 'Disponibilidad horaria' };
+type Editable = 'phone' | 'birthDate' | 'goal';
+const LABELS: Record<Editable, string> = { phone: 'Teléfono', birthDate: 'Fecha de nacimiento', goal: 'Objetivo' };
 
 function ProfileForm({ me, onSaved }: { me: Student; onSaved: () => void }) {
   const { notify } = useToast();
-  const fields = (['phone', 'birthDate', 'goal', 'availability'] as Editable[]).filter((f) => me.studentEditableFields.includes(f));
-  const [v, setV] = useState<Record<Editable, string>>({ phone: me.phone, birthDate: me.birthDate?.slice(0, 10) ?? '', goal: me.goal, availability: me.availability });
+  const fields = (['phone', 'birthDate', 'goal'] as Editable[]).filter((f) => me.studentEditableFields.includes(f));
+  const [v, setV] = useState<Record<Editable, string>>({ phone: me.phone, birthDate: me.birthDate?.slice(0, 10) ?? '', goal: me.goal });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
 

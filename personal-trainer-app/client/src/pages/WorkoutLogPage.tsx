@@ -167,7 +167,7 @@ export default function WorkoutLogPage() {
 
   return (
     <>
-      <PageHeader title="Registrar entrenamiento" description={`${data.name} · ${DAY_LABEL[day.dayOfWeek]}${day.label ? ` · ${day.label}` : ''}`} back={back} />
+      <PageHeader title="Registrar entrenamiento" description={`${data.name} · ${DAY_LABEL[day.dayOfWeek]}`} back={back} />
       <WorkoutForm routine={data} day={day} />
     </>
   );

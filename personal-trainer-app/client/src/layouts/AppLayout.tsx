@@ -1,4 +1,4 @@
-import { ClipboardList, Dumbbell, LayoutDashboard, LogOut, Menu, Package, UserRound, Users, Wallet, X, type LucideIcon } from 'lucide-react';
+import { Calendar, ClipboardList, Dumbbell, LayoutDashboard, LogOut, Menu, Package, Settings as SettingsIcon, UserRound, Users, Wallet, X, type LucideIcon } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
@@ -6,18 +6,21 @@ import { useAuth } from '../context/AuthContext';
 import { initials } from '../utils/format';
 import s from './layout.module.css';
 
-interface NavItem { to: string; label: string; icon: LucideIcon; end?: boolean }
+// `match`: otras rutas que también marcan este ítem como activo (p. ej. Ejercicios vive bajo el mismo ítem que Rutinas).
+interface NavItem { to: string; label: string; icon: LucideIcon; end?: boolean; match?: string[] }
 const TRAINER_NAV: NavItem[] = [
   { to: '/', label: 'Panel', icon: LayoutDashboard, end: true },
   { to: '/alumnos', label: 'Alumnos', icon: Users },
-  { to: '/rutinas', label: 'Rutinas', icon: ClipboardList },
-  { to: '/ejercicios', label: 'Ejercicios', icon: Dumbbell },
+  { to: '/rutinas', label: 'Ejercicios y rutinas', icon: ClipboardList, match: ['/ejercicios'] },
   { to: '/pagos', label: 'Pagos', icon: Wallet },
+  { to: '/agenda', label: 'Agenda', icon: Calendar },
   { to: '/planes', label: 'Planes', icon: Package },
+  { to: '/configuracion', label: 'Configuración', icon: SettingsIcon },
 ];
 const STUDENT_NAV: NavItem[] = [
   { to: '/mi-rutina', label: 'Mi rutina', icon: ClipboardList },
   { to: '/mis-pagos', label: 'Mi mensualidad', icon: Wallet },
+  { to: '/mis-turnos', label: 'Mis turnos', icon: Calendar },
   { to: '/mi-perfil', label: 'Mi perfil', icon: UserRound, end: true },
 ];
 
@@ -26,11 +29,18 @@ function Brand() {
 }
 
 function NavList({ items }: { items: NavItem[] }) {
+  const { pathname } = useLocation();
   return (
     <nav className={s.nav} aria-label="Navegación principal">
-      {items.map(({ to, label, icon: Icon, end }) => (
-        <NavLink key={to} to={to} end={end} className={s.link}><Icon size={18} aria-hidden="true" />{label}</NavLink>
-      ))}
+      {items.map(({ to, label, icon: Icon, end, match }) => {
+        // Si hay rutas adicionales (`match`), el resaltado propio de NavLink no alcanza: se calcula a mano.
+        const extraActive = match?.some((m) => pathname === m || pathname.startsWith(`${m}/`));
+        return (
+          <NavLink key={to} to={to} end={end} className={({ isActive }: { isActive: boolean }) => `${s.link} ${isActive || extraActive ? s.linkActive : ''}`}>
+            <Icon size={18} aria-hidden="true" />{label}
+          </NavLink>
+        );
+      })}
     </nav>
   );
 }

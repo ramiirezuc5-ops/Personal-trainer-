@@ -25,6 +25,9 @@ const WorkoutLogPage = lazy(() => import('./pages/WorkoutLogPage'));
 const MyBilling = lazy(() => import('./pages/MyBilling'));
 const Payments = lazy(() => import('./pages/Payments'));
 const Plans = lazy(() => import('./pages/Plans'));
+const Agenda = lazy(() => import('./pages/Agenda'));
+const Settings = lazy(() => import('./pages/Settings'));
+const MyAppointments = lazy(() => import('./pages/MyAppointments'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 function Home() {
@@ -63,6 +66,8 @@ export default function App() {
                         <Route path="rutinas/:id" element={<RoutineDetail />} />
                         <Route path="pagos" element={<Payments />} />
                         <Route path="planes" element={<Plans />} />
+                        <Route path="agenda" element={<Agenda />} />
+                        <Route path="configuracion" element={<Settings />} />
                       </Route>
                     )}
                     {SHOW_STUDENT && (
@@ -71,6 +76,7 @@ export default function App() {
                         <Route path="mi-rutina/:id" element={<MyRoutineDetail />} />
                         <Route path="mi-rutina/:id/registrar/:dayId" element={<WorkoutLogPage />} />
                         <Route path="mis-pagos" element={<MyBilling />} />
+                        <Route path="mis-turnos" element={<MyAppointments />} />
                         <Route path="mi-perfil" element={<StudentHome />} />
                       </Route>
                     )}

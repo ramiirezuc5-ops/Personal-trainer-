@@ -1,4 +1,4 @@
-import type { Compliance, Dashboard, MembershipInput, MyBilling, MyMembership, PaymentInput, PaymentRow, PendingRow, Plan, PlanInput, RevenueSummary, Exercise, ExerciseInput, MyRoutineSummary, Paged, RoutineCore, RoutineDetail, RoutineInput, RoutineStatus, RoutineSummary, Student, StudentDetail, StudentInput, User, WorkoutInput, WorkoutRecord } from '../types/api';
+import type { Appointment, AppointmentInput, AppointmentListParams, Availability, BaseLibraryResult, BookingInput, Compliance, Dashboard, MembershipInput, MyBilling, MyMembership, PaymentInput, PaymentRow, PendingRow, Plan, PlanInput, RevenueSummary, Exercise, ExerciseInput, MyRoutineSummary, Paged, RoutineCore, RoutineDetail, RoutineInput, RoutineStatus, RoutineSummary, Student, StudentDetail, StudentInput, TrainerSettings, TrainerSettingsInput, User, WorkoutInput, WorkoutRecord } from '../types/api';
 import { api } from './api';
 
 export const authApi = {
@@ -31,6 +31,10 @@ export const meApi = {
   workouts: (params: { page?: number; limit?: number } = {}) => api.get<Paged<WorkoutRecord>>('/me/workouts', { ...params }),
   compliance: (from: string, to: string) => api.get<Compliance>('/me/compliance', { from, to }),
   billing: () => api.get<MyBilling>('/me/billing'),
+  appointments: (params: AppointmentListParams = {}) => api.get<Paged<Appointment>>('/me/appointments', { ...params }),
+  availability: (date: string) => api.get<Availability>('/me/availability', { date }),
+  book: (input: BookingInput) => api.post<Appointment>('/me/appointments', input),
+  cancelAppointment: (id: string) => api.post<Appointment>(`/me/appointments/${id}/cancel`),
 };
 
 export interface ExerciseListParams { q?: string; muscleGroup?: string; archived?: boolean; page?: number; limit?: number }
@@ -40,6 +44,15 @@ export const exercisesApi = {
   update: (id: string, input: Partial<ExerciseInput>) => api.patch<Exercise>(`/exercises/${id}`, input),
   archive: (id: string) => api.post<Exercise>(`/exercises/${id}/archive`),
   restore: (id: string) => api.post<Exercise>(`/exercises/${id}/restore`),
+  remove: (id: string) => api.delete<void>(`/exercises/${id}`),
+  /** Carga la biblioteca base en el catálogo. Solo agrega lo que falta. */
+  importBase: () => api.post<BaseLibraryResult>('/exercises/base-library'),
+  /** Todos los ejercicios activos (el servidor entrega hasta 100 por página, así que se piden todas las páginas). */
+  listAll: async (): Promise<Exercise[]> => {
+    const first = await api.get<Paged<Exercise>>('/exercises', { archived: 'false', page: 1, limit: 100 });
+    const rest = await Promise.all(Array.from({ length: Math.max(0, first.pages - 1) }, (_, i) => api.get<Paged<Exercise>>('/exercises', { archived: 'false', page: i + 2, limit: 100 })));
+    return [first, ...rest].flatMap((r) => r.items);
+  },
 };
 
 export interface RoutineListParams { student?: string; status?: string; page?: number; limit?: number }
@@ -49,6 +62,8 @@ export const routinesApi = {
   create: (input: RoutineInput) => api.post<RoutineDetail>('/routines', input),
   update: (id: string, patch: Partial<RoutineCore>) => api.patch<RoutineDetail>(`/routines/${id}`, patch),
   setStatus: (id: string, status: RoutineStatus) => api.post<RoutineSummary>(`/routines/${id}/status`, { status }),
+  duplicate: (id: string) => api.post<RoutineDetail>(`/routines/${id}/duplicate`),
+  remove: (id: string) => api.delete<void>(`/routines/${id}`),
 };
 
 export const billingApi = {
@@ -63,4 +78,17 @@ export const billingApi = {
   voidPayment: (id: string, reason: string) => api.post<PaymentRow>(`/billing/payments/${id}/void`, { reason }),
   pending: () => api.get<PendingRow[]>('/billing/pending'),
   summary: (from?: string, to?: string) => api.get<RevenueSummary>('/billing/summary', { from, to }),
+};
+
+export const appointmentsApi = {
+  list: (params: AppointmentListParams = {}) => api.get<Paged<Appointment>>('/appointments', { ...params }),
+  create: (input: AppointmentInput) => api.post<Appointment>('/appointments', input),
+  reschedule: (id: string, start: string, end: string) => api.patch<Appointment>(`/appointments/${id}`, { start, end }),
+  setStatus: (id: string, status: 'confirmado' | 'completado') => api.post<Appointment>(`/appointments/${id}/status`, { status }),
+  cancel: (id: string, reason?: string) => api.post<Appointment>(`/appointments/${id}/cancel`, { ...(reason ? { reason } : {}) }),
+};
+
+export const settingsApi = {
+  get: () => api.get<TrainerSettings>('/settings'),
+  update: (patch: TrainerSettingsInput) => api.patch<TrainerSettings>('/settings', patch),
 };

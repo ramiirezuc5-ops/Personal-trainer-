@@ -1,4 +1,4 @@
-import { ClipboardList, MailPlus, Pencil, UserCheck, UserX } from 'lucide-react';
+import { Calendar, ClipboardList, MailPlus, Pencil, UserCheck, UserX } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Badge } from '../components/ui/Badge';
@@ -53,6 +53,7 @@ export default function StudentDetail() {
             <Badge tone={STATUS_TONE[data.status]}>{STATUS_LABEL[data.status]}</Badge>
             <Button variant="secondary" icon={<Pencil size={16} aria-hidden="true" />} onClick={() => setEditing(true)}>Editar</Button>
             <LinkButton to={`/rutinas/nueva?alumno=${data.id}`} variant="secondary" icon={<ClipboardList size={16} aria-hidden="true" />}>Nueva rutina</LinkButton>
+            <LinkButton to={`/agenda?alumno=${data.id}`} variant="secondary" icon={<Calendar size={16} aria-hidden="true" />}>Ver agenda</LinkButton>
             {data.status === 'pending' && <Button variant="secondary" icon={<MailPlus size={16} aria-hidden="true" />} loading={busy} onClick={() => void run(() => studentsApi.resendInvite(data.id), 'Invitación reenviada.')}>Reenviar invitación</Button>}
             {data.status === 'inactive'
               ? <Button icon={<UserCheck size={16} aria-hidden="true" />} loading={busy} onClick={() => void run(() => studentsApi.reactivate(data.id), 'Alumno reactivado.')}>Reactivar</Button>

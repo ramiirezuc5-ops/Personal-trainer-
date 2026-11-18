@@ -1,6 +1,6 @@
-import { Archive, CheckCheck, Pencil, Play, RotateCcw } from 'lucide-react';
+import { Archive, CheckCheck, Copy, Pencil, Play, RotateCcw, Trash2 } from 'lucide-react';
 import { useCallback, useState, type ReactNode } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
@@ -36,14 +36,14 @@ const ACTIONS: Record<RoutineStatus, Action[]> = {
 
 function EditPanel({ routine, studentName, onCancel, onSaved }: { routine: Routine; studentName: string; onCancel: () => void; onSaved: () => void }) {
   const { notify } = useToast();
-  const exercises = useAsync(() => exercisesApi.list({ limit: 100 }), []);
+  const exercises = useAsync(() => exercisesApi.listAll(), []);
   if (exercises.loading && !exercises.data) return <LoadingBlock label="Preparando el armador…" />;
   if (exercises.error != null && !exercises.data) return <ErrorState error={exercises.error} onRetry={exercises.reload} />;
   if (!exercises.data) return null;
   return (
     <RoutineForm
       initial={routine}
-      exercises={exercises.data.items}
+      exercises={exercises.data}
       // Solo se muestra el alumno: el servidor no permite cambiarlo en una rutina existente.
       students={[{ id: routine.student, firstName: studentName, lastName: '' }]}
       onCancel={onCancel}
@@ -58,6 +58,7 @@ function EditPanel({ routine, studentName, onCancel, onSaved }: { routine: Routi
 
 export default function RoutineDetail() {
   const { id = '' } = useParams();
+  const navigate = useNavigate();
   const { notify } = useToast();
   const { data, error, loading, reload } = useAsync(() => routinesApi.get(id), [id]);
   const student = useAsync<StudentDetail | null>(() => (data ? studentsApi.get(data.student) : Promise.resolve(null)), [data?.student]);
@@ -65,6 +66,26 @@ export default function RoutineDetail() {
   const [pending, setPending] = useState<Action | null>(null);
   const [busy, setBusy] = useState(false);
   const cancelPending = useCallback(() => setPending(null), []); // estable: el Modal reenfoca si cambia
+  const [duplicating, setDuplicating] = useState(false);
+  const [toDelete, setToDelete] = useState(false);
+  const [blocked, setBlocked] = useState('');
+  const closeDelete = useCallback(() => { setToDelete(false); setBlocked(''); }, []);
+
+  async function duplicate() {
+    setDuplicating(true);
+    try { const copy = await routinesApi.duplicate(id); notify('Rutina duplicada como borrador.'); navigate(`/rutinas/${copy._id}`); }
+    catch (err) { notify(err instanceof ApiError ? err.message : 'No se pudo duplicar.', 'danger'); }
+    finally { setDuplicating(false); }
+  }
+  const [deleting, setDeleting] = useState(false);
+  async function confirmDelete() {
+    setDeleting(true);
+    try { await routinesApi.remove(id); notify('Rutina eliminada.'); navigate('/rutinas', { replace: true }); }
+    catch (err) {
+      if (err instanceof ApiError && err.code === 'ROUTINE_IN_USE') setBlocked(err.message);
+      else notify(err instanceof ApiError ? err.message : 'No se pudo eliminar.', 'danger');
+    } finally { setDeleting(false); }
+  }
 
   async function changeStatus(a: Action) {
     setBusy(true);
@@ -93,9 +114,11 @@ export default function RoutineDetail() {
           <>
             <Badge tone={ROUTINE_TONE[data.status]}>{ROUTINE_STATUS_LABEL[data.status]}</Badge>
             <Button variant="secondary" icon={<Pencil size={16} aria-hidden="true" />} onClick={() => setEditing(true)}>Editar</Button>
+            <Button variant="secondary" icon={<Copy size={16} aria-hidden="true" />} loading={duplicating} onClick={() => void duplicate()}>Duplicar</Button>
             {ACTIONS[data.status].map((a) => (
               <Button key={a.to} variant={a.variant} icon={a.icon} loading={busy && pending === null} onClick={() => (a.confirm ? setPending(a) : void changeStatus(a))}>{a.label}</Button>
             ))}
+            <Button variant="ghost" icon={<Trash2 size={16} aria-hidden="true" />} onClick={() => setToDelete(true)}>Eliminar</Button>
           </>
         )}
       />
@@ -117,7 +140,7 @@ export default function RoutineDetail() {
           </Card>
 
           {days.map((day) => (
-            <Card key={day._id} title={`${DAY_LABEL[day.dayOfWeek]}${day.label ? ` · ${day.label}` : ''}`}>
+            <Card key={day._id} title={DAY_LABEL[day.dayOfWeek]}>
               <ul className={p.list}>
                 {day.exercises.map((it) => {
                   const meta = [
@@ -144,6 +167,9 @@ export default function RoutineDetail() {
 
       <ConfirmDialog open={pending !== null} loading={busy} title={pending ? `${pending.label}?` : ''} confirmLabel={pending?.label ?? ''}
         message={pending?.confirm} onCancel={cancelPending} onConfirm={() => pending && void changeStatus(pending)} />
+
+      <ConfirmDialog open={toDelete} danger loading={deleting} title="¿Eliminar rutina?" confirmLabel="Eliminar definitivamente"
+        message={blocked ? blocked : 'Esta acción no se puede deshacer.'} onCancel={closeDelete} onConfirm={() => void confirmDelete()} />
     </>
   );
 }

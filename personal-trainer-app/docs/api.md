@@ -20,8 +20,8 @@ Un recurso de otro usuario responde **404** (no se revela su existencia). Rol eq
 |---|---|
 | Alumnos | `GET/POST /students` (`q,status,level,sort,page,limit`) · `GET/PATCH /students/:id` · `POST /students/:id/{deactivate,reactivate,resend-invite}` |
 | Dentro de un alumno | `GET /students/:id/{workouts,compliance,progress,progress/compare,memberships}` · `POST /students/:id/{progress,memberships,payments}` |
-| Ejercicios | `GET/POST /exercises` · `GET/PATCH /exercises/:id` · `POST /exercises/:id/{archive,restore}` |
-| Rutinas | `GET/POST /routines` · `GET/PATCH /routines/:id` · `POST /routines/:id/status` |
+| Ejercicios | `GET/POST /exercises` · `GET/PATCH /exercises/:id` · `POST /exercises/:id/{archive,restore}` · `DELETE /exercises/:id` (borrado real; rechaza con 409 `EXERCISE_IN_USE` si alguna rutina lo usa) · `POST /exercises/base-library` (carga la biblioteca base; idempotente) |
+| Rutinas | `GET/POST /routines` · `GET/PATCH /routines/:id` · `POST /routines/:id/status` · `POST /routines/:id/duplicate` (copia la rutina completa como borrador) · `DELETE /routines/:id` (borrado real; rechaza con 409 `ROUTINE_IN_USE` si tiene entrenamientos registrados) |
 | Agenda | `GET/POST /appointments` · `PATCH /appointments/:id` (reprogramar) · `POST /appointments/:id/{status,cancel}` |
 | Planes y pagos | `GET/POST /billing/plans` · `PATCH /billing/plans/:id` · `POST /billing/memberships/:id/cancel` · `GET /billing/payments` · `POST /billing/payments/:id/void` · `GET /billing/{pending,summary}` |
 | Panel | `GET /dashboard` · `GET/PATCH /settings` |

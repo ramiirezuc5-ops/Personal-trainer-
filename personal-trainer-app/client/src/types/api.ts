@@ -38,12 +38,15 @@ export interface StudentInput {
 export type MuscleGroup = 'pecho' | 'espalda' | 'hombros' | 'biceps' | 'triceps' | 'piernas' | 'gluteos' | 'core' | 'cardio' | 'cuerpo_completo' | 'movilidad';
 export type MediaKind = 'image' | 'video';
 
+export type ExerciseDifficulty = 'principiante' | 'intermedio' | 'avanzado';
 export interface Exercise {
-  _id: string; name: string; muscleGroup: MuscleGroup; description: string; equipment: string;
+  _id: string; name: string; muscleGroup: MuscleGroup; secondaryMuscles: MuscleGroup[]; difficulty: ExerciseDifficulty | null;
+  description: string; equipment: string;
   instructions: string; commonMistakes: string; media?: { url: string; kind: MediaKind }; archived: boolean; createdAt: string;
 }
 export interface ExerciseInput {
-  name: string; muscleGroup: MuscleGroup; description?: string; equipment?: string;
+  name: string; muscleGroup: MuscleGroup; secondaryMuscles?: MuscleGroup[]; difficulty?: ExerciseDifficulty | null;
+  description?: string; equipment?: string;
   instructions?: string; commonMistakes?: string; media?: { url: string; kind: MediaKind };
 }
 
@@ -112,3 +115,27 @@ export interface PaymentRow {
 }
 export interface PendingRow { _id: string; status: MembershipStatus; endDate: string; due: number; currency: string; student: { id: string; firstName: string; lastName: string } }
 export interface RevenueSummary { timezone: string; byMonth: { month: string; currency: string; total: number; count: number }[]; totals: { currency: string; total: number; count: number }[] }
+
+export interface BaseLibraryResult { created: number; skipped: number; total: number }
+
+/* ---------- Agenda (turnos) ---------- */
+export type AppointmentStatus = 'reservado' | 'confirmado' | 'completado' | 'cancelado';
+export interface Appointment {
+  _id: string; student: { _id: string; firstName: string; lastName: string } | string;
+  start: string; end: string; type: string; status: AppointmentStatus; notes: string;
+  cancellation?: { at: string; reason?: string };
+}
+export interface AppointmentInput { student: string; start: string; end: string; type?: string; notes?: string; status?: 'reservado' | 'confirmado' }
+export interface AppointmentListParams { from?: string; to?: string; status?: AppointmentStatus; student?: string; page?: number; limit?: number }
+export interface Availability { enabled: boolean; timezone: string; slotMinutes?: number; slots: string[] }
+export interface BookingInput { start: string; notes?: string }
+
+/* ---------- Configuración del entrenador ---------- */
+export interface WorkingHour { weekday: number; start: string; end: string }
+export interface BookingSettings { allowStudentBooking: boolean; slotMinutes: number; minNoticeHours: number; maxAdvanceDays: number; cancellationHours: number }
+export interface NotificationSettings { email: boolean; paymentDue: boolean; appointmentReminders: boolean }
+export interface TrainerSettings {
+  name: string; email: string; businessName: string; phone: string; bio: string; photoUrl: string;
+  timezone: string; currency: string; workingHours: WorkingHour[]; notifications: NotificationSettings; booking: BookingSettings;
+}
+export type TrainerSettingsInput = Partial<Omit<TrainerSettings, 'email'>>;

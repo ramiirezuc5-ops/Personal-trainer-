@@ -75,3 +75,29 @@
 
 .rowStack { display: flex; flex-direction: column; gap: var(--space-1); min-width: 0; }
 .formStack { display: flex; flex-direction: column; gap: var(--space-4); }
+
+/* ---------- Selector de ejercicios ---------- */
+.pickList { max-height: 50vh; overflow-y: auto; border: 1px solid var(--color-border); border-radius: var(--radius-md); }
+.pickHead { position: sticky; top: 0; margin: 0; padding: var(--space-2) var(--space-4); font-size: var(--text-xs); text-transform: uppercase; letter-spacing: 0.04em; color: var(--color-text-muted); background: var(--color-surface-2); }
+.pickRow { display: flex; align-items: center; gap: var(--space-3); min-height: var(--touch-target); padding: 0 var(--space-4); cursor: pointer; border-top: 1px solid var(--color-border); font-size: var(--text-sm); }
+.pickRow:hover { background: var(--color-surface-2); }
+.pickRow input { width: 18px; height: 18px; accent-color: var(--color-accent); flex: none; }
+.pickName { flex: 1; min-width: 0; font-weight: 600; }
+.pickDisabled { opacity: 0.55; cursor: default; }
+
+/* ---------- Catálogo de ejercicios en tarjetas ---------- */
+.exGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: var(--space-4); }
+.exCard { display: flex; flex-direction: column; gap: var(--space-2); height: 100%; }
+.exCardHead { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-2); }
+.exCardName { font-weight: 700; font-size: var(--text-base); }
+.exCardMeta { display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center; }
+.exCardDesc { color: var(--color-text-muted); font-size: var(--text-sm); flex: 1; }
+.exCardActions { display: flex; gap: var(--space-2); flex-wrap: wrap; margin-top: var(--space-2); }
+.checkGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: var(--space-2); }
+.checkItem { display: flex; align-items: center; gap: var(--space-2); font-size: var(--text-sm); min-height: 32px; }
+
+/* ---------- Pestañas internas: Ejercicios y rutinas ---------- */
+.sectionTabs { display: flex; gap: var(--space-2); margin-bottom: var(--space-4); border-bottom: 1px solid var(--color-border); }
+.sectionTab { padding: var(--space-3) var(--space-2); min-height: var(--touch-target); font-weight: 650; color: var(--color-text-muted); text-decoration: none; border-bottom: 2px solid transparent; }
+.sectionTab:hover { color: var(--color-text); text-decoration: none; }
+.sectionTabActive { color: var(--color-accent); border-bottom-color: var(--color-accent); }

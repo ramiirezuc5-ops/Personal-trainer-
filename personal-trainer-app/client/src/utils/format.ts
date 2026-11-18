@@ -45,3 +45,19 @@ export const PAYMENT_METHOD_LABEL: Record<PaymentMethod, string> = { efectivo: '
 export const formatCalendarDate = (iso: string | null | undefined) => formatDate(iso, 'UTC');
 // Mediodía local de una fecha AAAA-MM-DD, en ISO: evita que la fecha se corra de día por la zona horaria.
 export const localNoonISO = (date: string) => new Date(`${date}T12:00:00`).toISOString();
+
+/** Próxima fecha (hoy incluido) en que cae un día de la semana (0 = domingo), en hora local. */
+export function nextDateOfWeekday(dow: number, from = new Date()): Date {
+  const d = new Date(from.getFullYear(), from.getMonth(), from.getDate());
+  d.setDate(d.getDate() + ((dow - d.getDay() + 7) % 7));
+  return d;
+}
+export const formatShortDate = (d: Date) => new Intl.DateTimeFormat(LOCALE, { day: 'numeric', month: 'short' }).format(d);
+
+export const APPOINTMENT_STATUS_LABEL: Record<string, string> = { reservado: 'Reservado', confirmado: 'Confirmado', completado: 'Completado', cancelado: 'Cancelado' };
+export const formatDateLong = (iso: string) => new Intl.DateTimeFormat(LOCALE, { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date(iso));
+export const DAY_SHORT = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+/** AAAA-MM-DD de una fecha, en hora local (para no correrse de día). */
+export const toYmd = (d: Date) => new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+export const addDaysYmd = (ymd: string, delta: number) => { const d = new Date(`${ymd}T12:00:00`); d.setDate(d.getDate() + delta); return toYmd(d); };
+export const DIFFICULTY_EX_LABEL: Record<'principiante' | 'intermedio' | 'avanzado', string> = { principiante: 'Principiante', intermedio: 'Intermedio', avanzado: 'Avanzado' };

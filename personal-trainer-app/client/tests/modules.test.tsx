@@ -244,6 +244,14 @@ describe('perfil del alumno', () => {
     await waitFor(() => expect(mocks.meApi.updateProfile).toHaveBeenCalledWith({ phone: '222' }));
   });
 
+  it('ya no muestra ni permite editar la disponibilidad horaria', async () => {
+    mocks.meApi.profile.mockResolvedValue(makeStudent({ studentEditableFields: ['phone', 'goal'], availability: 'Lunes y miércoles por la tarde' }));
+    renderApp(<StudentHome />, { user: studentUser });
+    await screen.findByLabelText('Teléfono');
+    expect(screen.queryByLabelText(/[Dd]isponibilidad/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/[Dd]isponibilidad/)).not.toBeInTheDocument();
+  });
+
   it('es honesto sobre lo que todavía no está disponible', async () => {
     mocks.meApi.profile.mockResolvedValue(makeStudent({ studentEditableFields: [] }));
     renderApp(<StudentHome />, { user: studentUser });

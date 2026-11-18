@@ -9,7 +9,7 @@ import { useAsync } from '../hooks/useAsync';
 import { useRefreshOnFocus } from '../hooks/useRefreshOnFocus';
 import { ApiError } from '../services/api';
 import { meApi } from '../services/endpoints';
-import { DAY_LABEL, DAY_ORDER, DIFFICULTY_LABEL, formatCalendarDate, MUSCLE_LABEL, ROUTINE_STATUS_LABEL } from '../utils/format';
+import { DAY_LABEL, DAY_ORDER, DIFFICULTY_LABEL, formatCalendarDate, formatShortDate, MUSCLE_LABEL, nextDateOfWeekday, ROUTINE_STATUS_LABEL } from '../utils/format';
 import p from './pages.module.css';
 import { ROUTINE_TONE } from './Routines';
 
@@ -46,7 +46,7 @@ export default function MyRoutineDetail() {
         </Card>
 
         {days.map((day) => (
-          <Card key={day._id} title={`${DAY_LABEL[day.dayOfWeek]}${day.label ? ` · ${day.label}` : ''}`}
+          <Card key={day._id} title={active ? `${DAY_LABEL[day.dayOfWeek]} ${formatShortDate(nextDateOfWeekday(day.dayOfWeek))}` : DAY_LABEL[day.dayOfWeek]}
             actions={(
               <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', flexWrap: 'wrap' }}>
                 {active && day.dayOfWeek === today && <Badge tone="info">Hoy</Badge>}

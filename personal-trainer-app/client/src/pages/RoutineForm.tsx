@@ -1,27 +1,29 @@
 import { ArrowDown, ArrowUp, Plus, Trash2 } from 'lucide-react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 import { Alert } from '../components/ui/Feedback';
+import { Modal } from '../components/ui/Modal';
 import { SelectField, TextAreaField, TextField } from '../components/ui/Field';
 import { ApiError, fieldErrors } from '../services/api';
 import type { Difficulty, Exercise, MuscleGroup, RoutineCore, RoutineDayInput, RoutineDetail, Student, WeightUnit } from '../types/api';
 import { DAY_LABEL, DAY_ORDER, DIFFICULTY_LABEL, MUSCLE_LABEL, todayISO } from '../utils/format';
+import { ExercisePicker } from './ExercisePicker';
 import p from './pages.module.css';
 
 interface ItemState { key: string; exercise: string; sets: string; reps: string; weight: string; unit: WeightUnit; rest: string; notes: string }
-interface DayState { key: string; dayOfWeek: string; label: string; items: ItemState[] }
+interface DayState { key: string; dayOfWeek: string; items: ItemState[] }
 
 let uid = 0;
 const nextKey = () => `k${++uid}`;
 const newItem = (): ItemState => ({ key: nextKey(), exercise: '', sets: '3', reps: '10', weight: '', unit: 'kg', rest: '60', notes: '' });
-const newDay = (dow: number): DayState => ({ key: nextKey(), dayOfWeek: String(dow), label: '', items: [newItem()] });
+const newDay = (dow: number): DayState => ({ key: nextKey(), dayOfWeek: String(dow), items: [] });
 
 function fromRoutine(r: RoutineDetail): DayState[] {
   return [...r.days]
     .sort((a, b) => DAY_ORDER.indexOf(a.dayOfWeek) - DAY_ORDER.indexOf(b.dayOfWeek))
     .map((d) => ({
-      key: nextKey(), dayOfWeek: String(d.dayOfWeek), label: d.label ?? '',
+      key: nextKey(), dayOfWeek: String(d.dayOfWeek),
       items: d.exercises.map((it) => ({
         key: nextKey(), exercise: it.exercise?._id ?? '', sets: String(it.sets), reps: it.reps,
         weight: it.weight?.value != null ? String(it.weight.value) : '', unit: it.weight?.unit ?? 'kg',
@@ -58,7 +60,9 @@ export function RoutineForm({ initial, defaultStudent, exercises, students, onSu
   const set = (k: keyof typeof v) => (e: { target: { value: string } }) => setV((s) => ({ ...s, [k]: e.target.value }));
   const updateDay = (i: number, patch: Partial<DayState>) => setDays((ds) => ds.map((d, idx) => (idx === i ? { ...d, ...patch } : d)));
   const updateItem = (di: number, ii: number, patch: Partial<ItemState>) => setDays((ds) => ds.map((d, idx) => (idx === di ? { ...d, items: d.items.map((it, j) => (j === ii ? { ...it, ...patch } : it)) } : d)));
-  const addItem = (di: number) => setDays((ds) => ds.map((d, idx) => (idx === di ? { ...d, items: [...d.items, newItem()] } : d)));
+  const addItems = (di: number, ids: string[]) => setDays((ds) => ds.map((d, idx) => (idx === di ? { ...d, items: [...d.items, ...ids.map((id) => ({ ...newItem(), exercise: id }))] } : d)));
+  const [pickerDay, setPickerDay] = useState<number | null>(null);
+  const closePicker = useCallback(() => setPickerDay(null), []); // estable: el Modal reenfoca si cambia
   const removeItem = (di: number, ii: number) => setDays((ds) => ds.map((d, idx) => (idx === di ? { ...d, items: d.items.filter((_, j) => j !== ii) } : d)));
   const moveItem = (di: number, ii: number, dir: -1 | 1) => setDays((ds) => ds.map((d, idx) => {
     if (idx !== di) return d;
@@ -80,7 +84,7 @@ export function RoutineForm({ initial, defaultStudent, exercises, students, onSu
     if (initial) {
       const known = new Set(list.map((e) => e._id));
       initial.days.forEach((d) => d.exercises.forEach((it) => {
-        if (it.exercise && !known.has(it.exercise._id)) { known.add(it.exercise._id); list.push({ ...it.exercise, description: '', archived: true, createdAt: '' }); }
+        if (it.exercise && !known.has(it.exercise._id)) { known.add(it.exercise._id); list.push({ ...it.exercise, description: '', archived: true, createdAt: '', secondaryMuscles: [], difficulty: null }); }
       }));
     }
     return list;
@@ -129,7 +133,7 @@ export function RoutineForm({ initial, defaultStudent, exercises, students, onSu
     const payloadDays: RoutineDayInput[] = [...days]
       .sort((a, b) => DAY_ORDER.indexOf(Number(a.dayOfWeek)) - DAY_ORDER.indexOf(Number(b.dayOfWeek)))
       .map((d) => ({
-        dayOfWeek: Number(d.dayOfWeek), ...(d.label.trim() ? { label: d.label.trim() } : {}),
+        dayOfWeek: Number(d.dayOfWeek),
         exercises: d.items.map((it) => ({
           exercise: it.exercise, sets: Number(it.sets), reps: it.reps.trim(),
           ...(it.weight.trim() ? { weight: { value: Number(it.weight), unit: it.unit } } : {}),
@@ -156,6 +160,7 @@ export function RoutineForm({ initial, defaultStudent, exercises, students, onSu
   }
 
   return (
+    <>
     <form onSubmit={(e) => void submit(e, editing ? 'edit' : 'borrador')} noValidate>
       {problems.length > 0 && (
         <div ref={problemsRef} tabIndex={-1} style={{ marginBottom: 'var(--space-4)', outline: 'none' }}>
@@ -190,8 +195,9 @@ export function RoutineForm({ initial, defaultStudent, exercises, students, onSu
               <SelectField label="Día de la semana" value={day.dayOfWeek} onChange={(e) => updateDay(di, { dayOfWeek: e.target.value })}>
                 {DAY_ORDER.map((n) => <option key={n} value={n}>{DAY_LABEL[n]}</option>)}
               </SelectField>
-              <TextField label="Nombre del día (opcional)" value={day.label} onChange={(e) => updateDay(di, { label: e.target.value })} maxLength={60} placeholder="Ej.: Tren inferior" />
             </div>
+
+            {day.items.length === 0 && <p className={p.empty}>Todavía no elegiste ejercicios para este día.</p>}
 
             {day.items.map((it, ii) => (
               <div key={it.key} className={p.itemBox}>
@@ -224,7 +230,7 @@ export function RoutineForm({ initial, defaultStudent, exercises, students, onSu
             ))}
 
             <div className={p.dayActions}>
-              <Button size="sm" variant="secondary" icon={<Plus size={16} aria-hidden="true" />} onClick={() => addItem(di)}>Agregar ejercicio</Button>
+              <Button size="sm" variant={day.items.length === 0 ? 'primary' : 'secondary'} icon={<Plus size={16} aria-hidden="true" />} onClick={() => setPickerDay(di)}>Elegir ejercicios</Button>
             </div>
           </Card>
         ))}
@@ -249,5 +255,17 @@ export function RoutineForm({ initial, defaultStudent, exercises, students, onSu
       </div>
       {!editing && <p style={{ marginTop: 'var(--space-3)', color: 'var(--color-text-muted)', fontSize: 'var(--text-xs)' }}>Al activar, el alumno recibe un aviso de rutina nueva. Un borrador solo lo ves vos.</p>}
     </form>
+
+    <Modal open={pickerDay !== null} title="Elegir ejercicios" onClose={closePicker}>
+      {pickerDay !== null && days[pickerDay] && (
+        <ExercisePicker
+          exercises={exercises}
+          alreadyIds={new Set(days[pickerDay].items.map((it) => it.exercise))}
+          onClose={closePicker}
+          onAdd={(ids) => { addItems(pickerDay, ids); closePicker(); }}
+        />
+      )}
+    </Modal>
+    </>
   );
 }

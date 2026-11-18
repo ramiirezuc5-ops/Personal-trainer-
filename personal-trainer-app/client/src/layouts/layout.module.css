@@ -45,3 +45,6 @@
 .tab:hover { color: var(--color-text); }
 .tab[aria-selected='true'] { background: var(--color-accent); color: var(--color-accent-contrast); }
 .tab:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+
+/* Resaltado manual para ítems de menú que cubren más de una ruta (ver NavItem.match en AppLayout.tsx) */
+.linkActive { background: var(--color-accent-soft); color: var(--color-accent); }

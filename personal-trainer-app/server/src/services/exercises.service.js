@@ -1,4 +1,5 @@
 import { Exercise } from '../models/Exercise.js';
+import { Routine } from '../models/Routine.js';
 import { conflict, notFound } from '../utils/errors.js';
 import { isDup } from '../utils/mongo.js';
 import { escapeRegex, pageInfo, pageResult } from '../utils/pagination.js';
@@ -38,4 +39,12 @@ export async function setArchived(trainerId, id, archived) {
   ex.archived = archived;
   await ex.save();
   return ex;
+}
+
+// Borrado real: solo si ninguna rutina (de cualquier estado, incluidas archivadas) lo usa. Si lo usa, se pide archivar en su lugar.
+export async function deleteExercise(trainerId, id) {
+  const ex = await getExercise(trainerId, id);
+  const inUse = await Routine.exists({ trainer: trainerId, 'days.exercises.exercise': ex._id });
+  if (inUse) throw conflict('Este ejercicio está usado en una o más rutinas. Archivalo en vez de eliminarlo, o quitalo primero de esas rutinas.', 'EXERCISE_IN_USE');
+  await ex.deleteOne();
 }

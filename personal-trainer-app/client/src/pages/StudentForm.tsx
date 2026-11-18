@@ -9,7 +9,7 @@ import p from './pages.module.css';
 
 const EDITABLE = [
   { value: 'phone', label: 'Teléfono' }, { value: 'birthDate', label: 'Fecha de nacimiento' },
-  { value: 'availability', label: 'Disponibilidad horaria' }, { value: 'goal', label: 'Objetivo' },
+  { value: 'goal', label: 'Objetivo' },
 ];
 
 interface Props { initial?: Student; submitLabel: string; onSubmit: (input: StudentInput) => Promise<void>; onCancel?: () => void }
@@ -20,7 +20,7 @@ export function StudentForm({ initial, submitLabel, onSubmit, onCancel }: Props)
     birthDate: initial?.birthDate?.slice(0, 10) ?? '', goal: initial?.goal ?? '', experienceLevel: (initial?.experienceLevel ?? 'principiante') as Level,
     availability: initial?.availability ?? '', notes: initial?.notes ?? '',
   });
-  const [editable, setEditable] = useState<string[]>(initial?.studentEditableFields ?? ['phone', 'availability']);
+  const [editable, setEditable] = useState<string[]>(initial?.studentEditableFields ?? ['phone']);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [serverError, setServerError] = useState('');
   const [loading, setLoading] = useState(false);
