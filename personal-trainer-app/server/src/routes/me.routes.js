@@ -10,6 +10,7 @@ import * as routines from '../services/routines.service.js';
 import * as students from '../services/students.service.js';
 import * as workouts from '../services/workouts.service.js';
 import { asyncHandler as h } from '../utils/asyncHandler.js';
+import * as exercisesService from '../services/exercises.service.js';
 import { scopeFor } from '../utils/ownership.js';
 import { idParam, isoDate } from '../utils/schemas.js';
 import * as v from '../validators/domain.validators.js';
@@ -28,7 +29,9 @@ meRouter.post('/workouts', validate(v.workoutCreate), h(async (req, res) => {
   const { log, duplicate } = await workouts.logWorkout(req.user, req.body);
   res.status(duplicate ? 200 : 201).json({ ...log.toObject(), duplicate });
 }));
+meRouter.get('/exercises', h(async (req, res) => res.json(await exercisesService.listActiveForTrainer(req.user.trainerId))));
 meRouter.get('/workouts', validate(v.rangeQuery, 'query'), h(async (req, res) => res.json(await workouts.listWorkouts(scopeFor(req.user), req.query))));
+meRouter.get('/workouts/last-performance', validate(v.exerciseIdList, 'query'), h(async (req, res) => res.json(await workouts.lastPerformance(scopeFor(req.user), req.query.exercises))));
 meRouter.get('/compliance', validate(z.object({ from: isoDate, to: isoDate }), 'query'), h(async (req, res) => res.json(await workouts.compliance(scopeFor(req.user), req.query.from, req.query.to))));
 
 meRouter.post('/progress', validate(v.progressCreateStudent), h(async (req, res) => res.status(201).json(await progress.createMeasurement(req.user, null, req.body))));

@@ -48,3 +48,14 @@ export async function deleteExercise(trainerId, id) {
   if (inUse) throw conflict('Este ejercicio está usado en una o más rutinas. Archivalo en vez de eliminarlo, o quitalo primero de esas rutinas.', 'EXERCISE_IN_USE');
   await ex.deleteOne();
 }
+
+// Catálogo de solo lectura para el alumno (ejercicios activos de su entrenador), para poder sumar
+// al registro de un entrenamiento un ejercicio que no estaba en el día, pero que ya existe en el catálogo.
+export async function listActiveForTrainer(trainerId) {
+  return Exercise.find({ trainer: trainerId, archived: false }).sort({ nameKey: 1 }).select('name muscleGroup secondaryMuscles difficulty description equipment instructions commonMistakes media archived createdAt');
+}
+
+// Para validar que un ejercicio que el alumno agrega "suelto" (fuera del día) sea real y de su propio entrenador.
+export async function exerciseBelongsToTrainer(trainerId, id) {
+  return Boolean(await Exercise.exists({ _id: id, trainer: trainerId, archived: false }));
+}
