@@ -2,7 +2,7 @@
 # Reenvía /api/* al backend (Render) y sirve el resto como aplicación de una sola página.
 
 [build]
-  command = "npm run build"
+  command = "npm ci --include=dev && npm run build"
   publish = "dist"
 
 [[redirects]]

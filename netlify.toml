@@ -1,0 +1,6 @@
+# The frontend app lives in personal-trainer-app/client. This overrides the
+# Base directory from the Netlify UI so builds run from the correct folder.
+# Build command, publish directory, redirects and headers are defined in
+# personal-trainer-app/client/netlify.toml.
+[build]
+  base = "personal-trainer-app/client"
