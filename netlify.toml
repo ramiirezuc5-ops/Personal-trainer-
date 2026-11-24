@@ -1,8 +1,11 @@
-# Configuración de despliegue para Netlify (reemplaza a vercel.json / vercel.example.json).
+# Configuración de despliegue para Netlify.
+# La app vive en personal-trainer-app/client; "base" en este archivo raíz
+# sobrescribe el directorio base configurado en el panel de Netlify.
 # Reenvía /api/* al backend (Render) y sirve el resto como aplicación de una sola página.
 
 [build]
-  command = "npm run build"
+  base = "personal-trainer-app/client"
+  command = "npm ci --include=dev && npm run build"
   publish = "dist"
 
 [[redirects]]
