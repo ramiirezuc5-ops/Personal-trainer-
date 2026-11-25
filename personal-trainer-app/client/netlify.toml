@@ -1,13 +1,10 @@
-# Configuración de despliegue para Netlify (reemplaza a vercel.json / vercel.example.json).
-# Reenvía /api/* al backend (Render) y sirve el resto como aplicación de una sola página.
-
 [build]
   command = "npm run build"
   publish = "dist"
 
 [[redirects]]
   from = "/api/*"
-  to = "https://TU-BACKEND.onrender.com/api/:splat"
+  to = "https://TU-URL-DE-RAILWAY.up.railway.app/api/:splat"
   status = 200
   force = true
 
