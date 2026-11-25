@@ -19,8 +19,6 @@ export const mocks = {
     workouts: vi.fn().mockResolvedValue({ items: [], page: 1, pages: 1, total: 0 }),
     compliance: vi.fn().mockResolvedValue({ expected: 0, completed: 0, percentage: null }),
     billing: vi.fn().mockResolvedValue({ memberships: [], payments: [] }),
-    lastPerformance: vi.fn().mockResolvedValue({}),
-    exercises: vi.fn().mockResolvedValue([]),
     appointments: vi.fn().mockResolvedValue({ items: [], page: 1, pages: 1, total: 0 }),
     availability: vi.fn().mockResolvedValue({ enabled: false, timezone: 'America/Argentina/Buenos_Aires', slots: [] }),
     book: vi.fn(),

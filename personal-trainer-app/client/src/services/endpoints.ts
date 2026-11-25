@@ -35,9 +35,6 @@ export const meApi = {
   availability: (date: string) => api.get<Availability>('/me/availability', { date }),
   book: (input: BookingInput) => api.post<Appointment>('/me/appointments', input),
   cancelAppointment: (id: string) => api.post<Appointment>(`/me/appointments/${id}/cancel`),
-  lastPerformance: (exerciseIds: string[]) => api.get<Record<string, { performedAt: string; sets: { reps: number; weight?: number }[] } | null>>('/me/workouts/last-performance', { exercises: exerciseIds.join(',') }),
-  /** Catálogo de ejercicios activos de tu entrenador, de solo lectura (para sumar un ejercicio suelto al entrenamiento). */
-  exercises: () => api.get<Exercise[]>('/me/exercises'),
 };
 
 export interface ExerciseListParams { q?: string; muscleGroup?: string; archived?: boolean; page?: number; limit?: number }

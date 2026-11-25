@@ -65,11 +65,6 @@ export const routineStatus = z.object({ status: z.enum(['borrador', 'activa', 'f
 export const routineListQuery = z.object({ student: objectId.optional(), status: z.enum(['borrador', 'activa', 'finalizada', 'archivada']).optional(), ...paginationQuery });
 
 /* ---------- Entrenamientos ---------- */
-// "id1,id2,id3" -> ['id1','id2','id3'], validando que cada uno sea un ObjectId. Máximo 20 (un día no tiene más ejercicios que eso).
-export const exerciseIdList = z.object({
-  exercises: z.string().min(1).transform((s) => s.split(',').map((x) => x.trim()).filter(Boolean)).pipe(z.array(objectId).min(1).max(20)),
-}).strict();
-
 export const workoutCreate = z.object({
   routine: objectId, dayId: objectId, performedAt: isoDate.optional(),
   exercises: z.array(z.object({
