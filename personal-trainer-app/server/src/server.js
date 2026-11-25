@@ -7,8 +7,10 @@ import { logger } from './utils/logger.js';
 async function main() {
   await connectDB();
   await ensureIndexes();
-  const server = createApp().listen(env.PORT, () => logger.info({ port: env.PORT, env: env.NODE_ENV }, 'API escuchando'));
-
+  // const server = createApp().listen(env.PORT, () => logger.info({ port: env.PORT, env: env.NODE_ENV }, 'API escuchando'));
+  const server = createApp().listen(env.PORT, '0.0.0.0', () => {
+  logger.info({ port: env.PORT, env: env.NODE_ENV }, 'API escuchando');
+});
   const shutdown = (signal) => {
     logger.info({ signal }, 'Cerrando servidor');
     server.close(async () => { await disconnectDB(); process.exit(0); });
